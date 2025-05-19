@@ -8,7 +8,7 @@ public class Player {
 
     private Texture playerTexture = new Texture(Gdx.files.internal("player1-.png"));
     private Sprite playerSprite = new Sprite(playerTexture);
-    private Weapon weapon = new Weapon("Revolver");
+    private Weapon weapon = new Weapon("Shotgun");
 
     private float posX = 0;
     private float posY = 0;

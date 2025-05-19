@@ -21,11 +21,13 @@ public class GameAssetManager {
     private String character1_idle2 = "player3.png";
     private String bullet1 = "bullet3.png";
     private String bullet2 = "bullet2.png";
+    private String tree = "item/tree.png";
     Texture texture1 = new Texture(Gdx.files.internal(character1_idle0));
     Texture texture2 = new Texture(Gdx.files.internal(character1_idle1));
     Texture texture3 = new Texture(Gdx.files.internal(character1_idle2));
     Texture bulletTexture1 = new Texture(Gdx.files.internal(bullet1));
     Texture bulletTexture2 = new Texture(Gdx.files.internal(bullet2));
+    Texture treeTexture = new Texture(Gdx.files.internal(tree));
     private final Animation<Texture> character1_idle_frames = new Animation<>(0.1f, texture1, texture2, texture3);
 
     public Skin getSkin() {
@@ -63,5 +65,9 @@ public class GameAssetManager {
 
     public Texture getBulletTexture2() {
         return bulletTexture2;
+    }
+
+    public Texture getTreeTexture() {
+        return treeTexture;
     }
 }

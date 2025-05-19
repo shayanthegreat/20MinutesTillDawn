@@ -7,6 +7,7 @@ public class App {
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
     private Player currentPlayer = new Player();
+    private boolean autoReload = false;
     public App() {
     }
 
@@ -27,5 +28,13 @@ public class App {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public boolean isAutoReload() {
+        return autoReload;
+    }
+
+    public void setAutoReload(boolean autoReload) {
+        this.autoReload = autoReload;
     }
 }

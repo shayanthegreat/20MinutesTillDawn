@@ -83,9 +83,9 @@ public class GameView implements Screen, InputProcessor {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
-        Main.getInstance().getBatch().begin();
+
         gameController.updateGame();
-        Main.getInstance().getBatch().end();
+
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }

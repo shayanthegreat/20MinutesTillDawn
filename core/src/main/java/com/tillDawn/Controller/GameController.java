@@ -1,5 +1,6 @@
 package com.tillDawn.Controller;
 
+import com.tillDawn.Main;
 import com.tillDawn.Model.App;
 import com.tillDawn.Model.Player;
 import com.tillDawn.View.GameView;
@@ -17,10 +18,13 @@ public class GameController {
     }
 
     public void updateGame(){
+
         if(view != null){
+            Main.getInstance().getBatch().begin();
             worldController.update();
             playerController.update();
             weaponController.update();
+            Main.getInstance().getBatch().end();
         }
     }
 
