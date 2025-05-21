@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tillDawn.Main;
-import com.tillDawn.Model.App;
-import com.tillDawn.Model.Bullet;
-import com.tillDawn.Model.Weapon;
+import com.tillDawn.Model.*;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -87,9 +85,16 @@ public class WeaponController {
         weapon.update(Gdx.graphics.getDeltaTime());
 
         sprite.draw(Main.getInstance().getBatch());
-
+        ArrayList<Monster> monsters = App.getInstance().getMonsters();
         for (Bullet bullet : bullets) {
             bullet.update();
+            CollisionRect bulletRect = bullet.getRect();
+            for (Monster monster : monsters) {
+                CollisionRect monsterRect = monster.getRect();
+                if(bulletRect.collidesWith(monsterRect)){
+                    bullet.monsterHit(monster);
+                }
+            }
             bullet.draw(Main.getInstance().getBatch());
         }
         Main.getInstance().getBatch().end();

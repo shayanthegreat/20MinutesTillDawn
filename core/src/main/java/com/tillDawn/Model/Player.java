@@ -13,6 +13,7 @@ public class Player {
     private float posX = 0;
     private float posY = 0;
     private float playerHealth = 100;
+    private float maxHealth = 100;
     private CollisionRect rect;
     private float time = 0;
     private float speed = 5;
@@ -23,11 +24,22 @@ public class Player {
 
     private boolean isPlayerIdle = true;
     private boolean isPlayerRunning = false;
-
+    private boolean isDead = false;
     public Player(){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
-        playerSprite.setSize(playerTexture.getWidth() / 8, playerTexture.getHeight() / 8);
-        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() * 3, playerTexture.getHeight() * 3);
+        playerSprite.setSize(playerTexture.getWidth() / 9, playerTexture.getHeight() / 9);
+        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() / 9, playerTexture.getHeight() / 9);
+    }
+
+    public void updateHealth(float x){
+        playerHealth += x;
+        if(playerHealth > maxHealth){
+            playerHealth = maxHealth;
+        }
+        if(playerHealth <= 0){
+            isDead = true;
+        }
+        //System.out.println(playerHealth);
     }
 
     public Texture getPlayerTexture() {

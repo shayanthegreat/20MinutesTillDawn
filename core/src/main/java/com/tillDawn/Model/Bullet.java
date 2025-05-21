@@ -25,9 +25,21 @@ public class Bullet {
     }
 
     public void update() {
-        sprite.translate(direction.x * speed * Gdx.graphics.getDeltaTime(), direction.y * speed * Gdx.graphics.getDeltaTime());
+        float dx = direction.x * speed * Gdx.graphics.getDeltaTime();
+        float dy = direction.y * speed * Gdx.graphics.getDeltaTime();
+
+        sprite.translate(dx, dy);
+        position.add(dx, dy);
+        rect.setX(position.x);
+        rect.setY(position.y);
+        // Update the collision rectangle to match the new sprite position
+        rect.move(sprite.getX(), sprite.getY());
     }
 
+    public void monsterHit(Monster monster) {
+        float x = (float) damage;
+        monster.updateHealth(x);
+    }
     public void draw(Batch batch) {
         sprite.draw(batch);
     }
@@ -56,4 +68,7 @@ public class Bullet {
         this.damage = damage;
     }
 
+    public CollisionRect getRect() {
+        return rect;
+    }
 }

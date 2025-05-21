@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.tillDawn.Main;
+import com.tillDawn.Model.App;
 import com.tillDawn.Model.GameAssetManager;
 import com.tillDawn.Model.Player;
+import com.tillDawn.Model.Tree;
 
 import java.util.ArrayList;
 
@@ -25,40 +27,58 @@ public class PlayerController {
             idleAnimation();
         }
         player.getPlayerSprite().draw(Main.getInstance().getBatch());
-
     }
 
     public boolean handlePlayerInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            player.setPosY(player.getPosY() - player.getSpeed());
-            flip = false;
-            return true;
-        }
+        float oldX = player.getPosX();
+        float oldY = player.getPosY();
+        float speed = player.getSpeed();
+        boolean moved = false;
+
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            player.setPosY(player.getPosY() + player.getSpeed());
-            flip = false;
-            return true;
+            player.setPosY(oldY - speed);
+            moved = true;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            player.setPosX(player.getPosX() - player.getSpeed());
-            flip = false;
-            if (!facingRight) {
-                flip = true;
-                facingRight = true;
-            }
-            return true;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            player.setPosY(oldY + speed);
+            moved = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            player.setPosX(player.getPosX() + player.getSpeed());
-            flip = false;
+            player.setPosX(oldX - speed);
+            moved = true;
             if (facingRight) {
                 flip = true;
                 facingRight = false;
             }
-            return true;
         }
-        return false;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            player.setPosX(oldX + speed);
+            moved = true;
+            if (!facingRight) {
+                flip = true;
+                facingRight = true;
+            }
+        }
+
+        // Update collision rect
+        player.getRect().move(player.getPosX(), player.getPosY());
+
+        ArrayList<Tree> trees = App.getInstance().getTrees();
+        // Check collision with trees
+        for (Tree tree : trees) {
+            tree.updateRect(); // make sure it's current
+            if (player.getRect().collidesWith(tree.getRect())) {
+                // Revert movement on collision
+                player.setPosX(oldX);
+                player.setPosY(oldY);
+                player.getRect().move(oldX, oldY);
+                return false;
+            }
+        }
+
+        return moved;
     }
+
 
     public void idleAnimation() {
         Animation<TextureRegion> animation = GameAssetManager.getInstance().getCharacter1_idle_frames();
