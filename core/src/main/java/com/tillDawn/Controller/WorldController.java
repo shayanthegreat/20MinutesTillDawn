@@ -21,7 +21,6 @@ public class WorldController {
     private float backgroundHeight = 1080;
 
      // adjust as needed
-
     // Private constructor to prevent instantiation
     private WorldController(PlayerController playerController) {
         this.playerController = playerController;

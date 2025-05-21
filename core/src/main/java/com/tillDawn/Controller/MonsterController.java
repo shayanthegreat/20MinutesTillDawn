@@ -28,7 +28,7 @@ public class MonsterController {
 
         if (spawnTimer >= 3f) {
             float j = gameTime; // Total seconds since game started
-            int monstersToSpawn = (int) j / (30);
+            int monstersToSpawn = (int) j / (5);
 
             for (int i = 0; i < monstersToSpawn; i++) {
                 spawnMonster();
