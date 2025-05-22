@@ -8,8 +8,8 @@ public class Player {
 
     private Texture playerTexture = new Texture(Gdx.files.internal("player1-.png"));
     private Sprite playerSprite = new Sprite(playerTexture);
-    private Weapon weapon = new Weapon("Shotgun");
-
+    private Weapon weapon = null;
+    private CharacterType characterType = null;
     private float posX = 0;
     private float posY = 0;
     private float playerHealth = 100;
@@ -17,7 +17,6 @@ public class Player {
     private CollisionRect rect;
     private float time = 0;
     private float speed = 5;
-
     public float getSpeed() {
         return speed;
     }
@@ -119,5 +118,17 @@ public class Player {
 
     public Weapon getWeapon() {
         return weapon;
+    }
+
+    public CharacterType getCharacterType() {
+        return characterType;
+    }
+
+    public void setCharacterType(CharacterType characterType) {
+        this.characterType = characterType;
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
     }
 }

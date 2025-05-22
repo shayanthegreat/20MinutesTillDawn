@@ -16,7 +16,7 @@ public class App {
     private boolean autoReload = false;
     private boolean sfxSound = false;
     private boolean musicSound = false;
-    private CharacterType currentCharacter = CharacterType.Scarlet;
+    private int gameTime;
     ArrayList<Monster> monsters = new ArrayList<>();
     public App() {
         for (int i = 0; i < TREE_COUNT; i++) {
@@ -92,11 +92,11 @@ public class App {
         this.musicSound = musicSound;
     }
 
-    public CharacterType getCurrentCharacter() {
-        return currentCharacter;
+    public int getGameTime() {
+        return gameTime;
     }
 
-    public void setCurrentCharacter(CharacterType currentCharacter) {
-        this.currentCharacter = currentCharacter;
+    public void setGameTime(int gameTime) {
+        this.gameTime = gameTime;
     }
 }

@@ -48,7 +48,7 @@ public class ProfileView implements Screen {
         this.changePasswordButton = new TextButton("Change Password", skin);
         this.deleteUserButton = new TextButton("Delete Account", skin);
         this.changeAvatarButton = new TextButton("Change Avatar", skin);
-        this.backButton = new TextButton("Main Menu", skin);
+        this.backButton = new TextButton("Back", skin);
 
         this.table = new Table();
     }
@@ -108,6 +108,9 @@ public class ProfileView implements Screen {
                             if (!newUsername.isEmpty()) {
                                 Result result = controller.changeUsername(newUsername);
                                 Gdx.app.postRunnable(() -> showFeedbackDialog(result));
+                                if (result.isSuccess()) {
+                                    usernameLabel.setText(App.getInstance().getCurrentUser().getName()); // <-- Add this
+                                }
                             } else {
                                 Gdx.app.postRunnable(() -> showFeedbackDialog(new Result("Username cannot be empty.", false)));
                             }
@@ -126,7 +129,6 @@ public class ProfileView implements Screen {
                 dialog.show(stage);
             }
         });
-
         changePasswordButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

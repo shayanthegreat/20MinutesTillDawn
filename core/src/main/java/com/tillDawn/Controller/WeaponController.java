@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
+import com.sun.security.auth.LdapPrincipal;
 import com.tillDawn.Main;
 import com.tillDawn.Model.*;
 import com.badlogic.gdx.math.MathUtils;
@@ -18,6 +19,7 @@ public class WeaponController {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
     private ArrayList<Bullet> bullets = new ArrayList<>();
+    private float shootCooldown = 0f; // in seconds
     public void handleWeaponRotation(int x, int y) {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
         Sprite weaponSprite = weapon.getSprite();
@@ -49,11 +51,9 @@ public class WeaponController {
         float startX = playerSprite.getX() + playerSprite.getWidth() / 2;
         float startY = playerSprite.getY() + playerSprite.getHeight() / 2;
 
-        // 🛠 Convert screen coordinates to world coordinates using the camera
         Vector3 worldMouse = new Vector3(targetX, targetY, 0);
         CameraController.getCameraController().getCamera().unproject(worldMouse);
 
-        // 🔁 Compute direction from player to mouse in world coordinates
         Vector2 baseDirection = new Vector2(worldMouse.x - startX, worldMouse.y - startY).nor();
 
         if (weapon.getName().equalsIgnoreCase("Shotgun")) {
@@ -80,13 +80,34 @@ public class WeaponController {
         }
     }
 
+    private Monster getNearestMonster(float maxRange) {
+        float playerX = App.getInstance().getCurrentPlayer().getPlayerSprite().getX() + App.getInstance().getCurrentPlayer().getPlayerSprite().getWidth() / 2;
+        float playerY = App.getInstance().getCurrentPlayer().getPlayerSprite().getY() + App.getInstance().getCurrentPlayer().getPlayerSprite().getHeight() / 2;
+
+        Monster nearest = null;
+        float nearestDistSq = maxRange * maxRange;
+
+        for (Monster monster : App.getInstance().getMonsters()) {
+            if(monster.isDead())
+                continue;
+            float dx = monster.getPosX() - playerX;
+            float dy = monster.getPosY() - playerY;
+            float distSq = dx * dx + dy * dy;
+
+            if (distSq < nearestDistSq) {
+                nearestDistSq = distSq;
+                nearest = monster;
+            }
+        }
+        return nearest;
+    }
 
 
     public void update() {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
         Sprite sprite = weapon.getSprite();
         handlePlayerInput();
-
+        shootCooldown -= Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             if (sprite.getScaleY() > 0) sprite.setScale(1, -1); // flip horizontally
         } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
@@ -121,7 +142,6 @@ public class WeaponController {
             float x = playerX - barWidth / 2;
             float y = playerY + 10;
 
-            // ✅ Set camera projection matrix
             shapeRenderer.setProjectionMatrix(CameraController.getCameraController().getCamera().combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -138,13 +158,33 @@ public class WeaponController {
 
     public void handlePlayerInput(){
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
-        if(Gdx.input.isKeyPressed(Input.Keys.R)){
+
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             weapon.reload();
             return;
         }
-        if(weapon.getAmmo() <= 0 && App.getInstance().isAutoReload()){
+
+        if (weapon.getAmmo() <= 0 && App.getInstance().isAutoReload()) {
             weapon.reload();
             return;
+        }
+
+        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) && App.getInstance().isAutoReload()) && shootCooldown <= 0f) {
+            Monster monster = getNearestMonster(2000);
+            if (monster != null) {
+                float deltaX = monster.getPosX() - App.getInstance().getCurrentPlayer().getPosX();
+                float deltaY = monster.getPosY() - App.getInstance().getCurrentPlayer().getPosY();
+                float x = deltaX + Gdx.graphics.getWidth() / 2;
+                float y = -deltaY + Gdx.graphics.getHeight() / 2;
+
+                Gdx.input.setCursorPosition((int) x, (int) y);
+                handleWeaponShoot((int) x, (int) y);
+
+                shootCooldown = 0.5f; // reset cooldown
+            }
         }
     }
+
+
+
 }

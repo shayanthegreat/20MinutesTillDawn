@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 public class Monster {
     private Texture texture = new Texture(Gdx.files.internal("monster.png"));
     private Sprite sprite;
-
     private float posX = 0;
     private float posY = 0;
     private float health = 100;

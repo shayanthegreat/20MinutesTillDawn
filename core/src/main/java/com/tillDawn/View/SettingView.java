@@ -24,14 +24,7 @@ import com.tillDawn.Model.MusicManager;
 import static com.badlogic.gdx.scenes.scene2d.ui.Table.Debug.table;
 
 public class SettingView implements Screen {
-    private static SettingView instance;
-//    public static SettingView getInstance(){
-//        if (instance == null){
-//            instance = new SettingView(new SettingController(), GameAssetManager.getInstance().getSkin());
-//
-//        }
-//        return instance;
-//    }
+
     private final Skin skin;
     private final Stage stage;
     private final Slider musicVolumeSlider;
@@ -56,10 +49,10 @@ public class SettingView implements Screen {
         blackAndWhiteCheckBox = new CheckBox("Black and White", skin);
         musicTrackSelectBox = new SelectBox<>(skin);
         musicTrackSelectBox.setItems("music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3"); // Change these to match your assets
-        this.backButton = new TextButton("Main Menu", skin);
+        this.backButton = new TextButton("Back", skin);
         // Music On
         musicVolumeSlider.setValue(MusicManager.getMusicManager().getVolume() * 100f);
-        musicOnCheckBox.setChecked(MusicManager.getMusicManager().getCurrentMusic().isPlaying());
+        musicOnCheckBox.setChecked(App.getInstance().isMusicSound());
         sfxOnCheckBox.setChecked(App.getInstance().isSfxSound());
         reloadOnCheckBox.setChecked(App.getInstance().isAutoReload());
         blackAndWhiteCheckBox.setChecked(false);
@@ -117,6 +110,7 @@ public class SettingView implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 boolean on = musicOnCheckBox.isChecked();
+                App.getInstance().setMusicSound(on);
                 if(!on){
                     MusicManager.getMusicManager().pause();
                 }

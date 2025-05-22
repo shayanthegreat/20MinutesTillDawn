@@ -34,7 +34,7 @@ public class GameAssetManager {
 
 
     public Animation<TextureRegion> getCharacter_idle_frames() {
-        String heroName = App.getInstance().getCurrentCharacter().getName();
+        String heroName = App.getInstance().getCurrentPlayer().getCharacterType().getName();
         String character1_idle0 = "Heros/"+heroName+"/idle/Idle_0.png";
         String character1_idle1 = "Heros/"+heroName+"/idle/Idle_1.png";
         String character1_idle2 = "Heros/"+heroName+"/idle/Idle_2.png";
@@ -59,7 +59,7 @@ public class GameAssetManager {
     }
 
     public Animation<TextureRegion> getCharacter_run_frames() {
-        String heroName = App.getInstance().getCurrentCharacter().getName();
+        String heroName = App.getInstance().getCurrentPlayer().getCharacterType().getName();
         String character1_run0 = "Heros/"+heroName+"/run/Run_0.png";
         String character1_run1 = "Heros/"+heroName+"/run/Run_1.png";
         String character1_run2 = "Heros/"+heroName+"/run/Run_2.png";
