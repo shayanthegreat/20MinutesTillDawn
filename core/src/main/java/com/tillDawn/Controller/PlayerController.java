@@ -23,10 +23,15 @@ public class PlayerController {
 
     public void update() {
         boolean isMoving = handlePlayerInput();
-        if (isMoving) {
+        if (!isMoving) {
             idleAnimation();
         }
+        else{
+            runAnimation();
+        }
+        player.getPlayerSprite().setPosition(player.getPosX(), player.getPosY());
         player.getPlayerSprite().draw(Main.getInstance().getBatch());
+
     }
 
     public boolean handlePlayerInput() {
@@ -81,9 +86,11 @@ public class PlayerController {
 
 
     public void idleAnimation() {
-        Animation<TextureRegion> animation = GameAssetManager.getInstance().getCharacter1_idle_frames();
+        Animation<TextureRegion> animation = GameAssetManager.getInstance().getCharacter_idle_frames();
 
-        TextureRegion frame = animation.getKeyFrame(player.getTime());
+        animation.setPlayMode(Animation.PlayMode.LOOP); // Make sure it's looping
+
+        TextureRegion frame = animation.getKeyFrame(player.getTime(), true); // second param = looping
 
         if (!facingRight && !frame.isFlipX()) {
             frame.flip(true, false);
@@ -92,9 +99,23 @@ public class PlayerController {
         }
 
         player.getPlayerSprite().setRegion(frame);
-
         player.setTime(player.getTime() + Gdx.graphics.getDeltaTime());
-        animation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
+    public void runAnimation() {
+        Animation<TextureRegion> animation = GameAssetManager.getInstance().getCharacter_run_frames();
+
+        animation.setPlayMode(Animation.PlayMode.LOOP); // Make sure it's looping
+
+        TextureRegion frame = animation.getKeyFrame(player.getTime(), true); // second param = looping
+
+        if (!facingRight && !frame.isFlipX()) {
+            frame.flip(true, false);
+        } else if (facingRight && frame.isFlipX()) {
+            frame.flip(true, false);
+        }
+
+        player.getPlayerSprite().setRegion(frame);
+        player.setTime(player.getTime() + Gdx.graphics.getDeltaTime());
+    }
 }

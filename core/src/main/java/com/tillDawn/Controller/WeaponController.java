@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.tillDawn.Main;
 import com.tillDawn.Model.*;
 import com.badlogic.gdx.math.MathUtils;
@@ -21,31 +22,40 @@ public class WeaponController {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
         Sprite weaponSprite = weapon.getSprite();
 
-        // Center of the screen
-        float centerX = Gdx.graphics.getWidth() / 2f;
-        float centerY = Gdx.graphics.getHeight() / 2f;
+        Sprite playerSprite = App.getInstance().getCurrentPlayer().getPlayerSprite();
+        float playerX = playerSprite.getX() + playerSprite.getWidth() / 2;
+        float playerY = playerSprite.getY() + playerSprite.getHeight() / 2;
 
-        weaponSprite.setPosition(centerX, centerY);
+        weaponSprite.setPosition(playerX - weaponSprite.getWidth() / 2, playerY - weaponSprite.getHeight() / 2);
+
 
         weaponSprite.setOriginCenter();
 
-        float angle = (float) Math.atan2(y - centerY, x - centerX);
+        Vector3 mouseWorld = CameraController.getCameraController().getCamera()
+            .unproject(new Vector3(x, y, 0));
 
-        weaponSprite.setRotation((float) (3 - angle * MathUtils.radiansToDegrees));
+        float angle = MathUtils.atan2(mouseWorld.y - playerY, mouseWorld.x - playerX);
+        weaponSprite.setRotation(angle * MathUtils.radiansToDegrees);
+
+
+        weaponSprite.setRotation((float) (angle * MathUtils.radiansToDegrees));
     }
 
     public void handleWeaponShoot(int targetX, int targetY) {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
-        if (weapon.isReloading()) return;
-        if (weapon.getAmmo() <= 0) return;
+        if (weapon.isReloading() || weapon.getAmmo() <= 0) return;
 
-        float startX = Gdx.graphics.getWidth() / 2f;
-        float startY = Gdx.graphics.getHeight() / 2f;
-        float flippedY = Gdx.graphics.getHeight() - targetY;
+        Sprite playerSprite = App.getInstance().getCurrentPlayer().getPlayerSprite();
+        float startX = playerSprite.getX() + playerSprite.getWidth() / 2;
+        float startY = playerSprite.getY() + playerSprite.getHeight() / 2;
 
-        Vector2 baseDirection = new Vector2(targetX - startX, flippedY - startY).nor();
+        // 🛠 Convert screen coordinates to world coordinates using the camera
+        Vector3 worldMouse = new Vector3(targetX, targetY, 0);
+        CameraController.getCameraController().getCamera().unproject(worldMouse);
 
-        // Shotgun logic (adjust condition to your actual shotgun check)
+        // 🔁 Compute direction from player to mouse in world coordinates
+        Vector2 baseDirection = new Vector2(worldMouse.x - startX, worldMouse.y - startY).nor();
+
         if (weapon.getName().equalsIgnoreCase("Shotgun")) {
             int pelletCount = 4;
             int ammoToUse = Math.min(pelletCount, weapon.getAmmo());
@@ -56,7 +66,7 @@ public class WeaponController {
 
                 Bullet pellet = new Bullet(weapon.getAmmoDamage(), startX, startY, spreadDir);
                 pellet.getSprite().setOriginCenter();
-                pellet.getSprite().setRotation(weapon.getSprite().getRotation() + angleOffset);
+                pellet.getSprite().setRotation(spreadDir.angleDeg());
                 bullets.add(pellet);
             }
 
@@ -64,11 +74,12 @@ public class WeaponController {
         } else {
             Bullet newBullet = new Bullet(weapon.getAmmoDamage(), startX, startY, baseDirection);
             newBullet.getSprite().setOriginCenter();
-            newBullet.getSprite().setRotation(weapon.getSprite().getRotation());
+            newBullet.getSprite().setRotation(baseDirection.angleDeg());
             bullets.add(newBullet);
             weapon.setAmmo(weapon.getAmmo() - 1);
         }
     }
+
 
 
     public void update() {
@@ -81,7 +92,7 @@ public class WeaponController {
         } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             if (sprite.getScaleY() < 0) sprite.setScale(1, 1); // unflip
         }
-
+        sprite.setPosition(App.getInstance().getCurrentPlayer().getPosX(), App.getInstance().getCurrentPlayer().getPosY());
         weapon.update(Gdx.graphics.getDeltaTime());
 
         sprite.draw(Main.getInstance().getBatch());
@@ -110,6 +121,8 @@ public class WeaponController {
             float x = playerX - barWidth / 2;
             float y = playerY + 10;
 
+            // ✅ Set camera projection matrix
+            shapeRenderer.setProjectionMatrix(CameraController.getCameraController().getCamera().combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
             shapeRenderer.setColor(Color.DARK_GRAY);

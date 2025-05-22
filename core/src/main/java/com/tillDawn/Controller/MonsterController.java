@@ -41,8 +41,8 @@ public class MonsterController {
         // Update all monsters
         for (Monster monster : monsters) {
             CollisionRect monsterRect = monster.getRect();
-            if (!monsterRect.collidesWith(new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2, playerRect.getWidth(), playerRect.getHeight()))) {
-                monster.update(deltaTime, (float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2); // Move toward player
+            if (!monsterRect.collidesWith(playerRect)) {
+                monster.update(deltaTime, player.getPosX(), player.getPosY()); // Move toward player
             } else {
                 monster.damage(player);
             }

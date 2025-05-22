@@ -10,10 +10,13 @@ public class App {
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
     private Player currentPlayer = new Player();
+    private User currentUser = new User("shayan", "sabzi", "asdad", "asdasdasd");
     private ArrayList<Tree> trees = new ArrayList<>();
     private final int TREE_COUNT = 500;
     private boolean autoReload = false;
-
+    private boolean sfxSound = false;
+    private boolean musicSound = false;
+    private CharacterType currentCharacter = CharacterType.Scarlet;
     ArrayList<Monster> monsters = new ArrayList<>();
     public App() {
         for (int i = 0; i < TREE_COUNT; i++) {
@@ -61,4 +64,39 @@ public class App {
         return monsters;
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public boolean isSfxSound() {
+        return sfxSound;
+    }
+
+    public void setSfxSound(boolean sfxSound) {
+        this.sfxSound = sfxSound;
+    }
+
+    public boolean isMusicSound() {
+        return musicSound;
+    }
+
+    public void setMusicSound(boolean musicSound) {
+        this.musicSound = musicSound;
+    }
+
+    public CharacterType getCurrentCharacter() {
+        return currentCharacter;
+    }
+
+    public void setCurrentCharacter(CharacterType currentCharacter) {
+        this.currentCharacter = currentCharacter;
+    }
 }

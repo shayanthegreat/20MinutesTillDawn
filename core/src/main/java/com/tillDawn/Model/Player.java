@@ -27,8 +27,10 @@ public class Player {
     private boolean isDead = false;
     public Player(){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
-        playerSprite.setSize(playerTexture.getWidth() / 9, playerTexture.getHeight() / 9);
-        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() / 9, playerTexture.getHeight() / 9);
+        playerSprite.setSize(playerTexture.getWidth() / 7, playerTexture.getHeight() / 7);
+        posX = (float) Gdx.graphics.getWidth() / 2;
+        posY = (float) Gdx.graphics.getHeight() / 2;
+        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() / 7, playerTexture.getHeight() / 7);
     }
 
     public void updateHealth(float x){
