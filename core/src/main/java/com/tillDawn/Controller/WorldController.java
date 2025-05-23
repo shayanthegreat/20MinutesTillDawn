@@ -1,7 +1,9 @@
 package com.tillDawn.Controller;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -20,6 +22,7 @@ public class WorldController {
     private float backgroundWidth = 1920;
     private float backgroundHeight = 1080;
     private CameraController cameraController = CameraController.getCameraController();
+// Default font
      // adjust as needed
     // Private constructor to prevent instantiation
     private WorldController(PlayerController playerController) {
@@ -28,6 +31,7 @@ public class WorldController {
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         backgroundRegion = new TextureRegion(backgroundTexture);
         backgroundRegion.setRegion(0, 0, (int) backgroundWidth, (int) backgroundHeight);
+
     }
 
     // Public method to provide access to the instance

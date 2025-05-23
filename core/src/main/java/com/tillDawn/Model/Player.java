@@ -20,7 +20,7 @@ public class Player {
     public float getSpeed() {
         return speed;
     }
-
+    private int currentKills;
     private boolean isPlayerIdle = true;
     private boolean isPlayerRunning = false;
     private boolean isDead = false;
@@ -130,5 +130,13 @@ public class Player {
 
     public void setWeapon(Weapon weapon) {
         this.weapon = weapon;
+    }
+
+    public int getCurrentKills() {
+        return currentKills;
+    }
+
+    public void setCurrentKills(int currentKills) {
+        this.currentKills = currentKills;
     }
 }

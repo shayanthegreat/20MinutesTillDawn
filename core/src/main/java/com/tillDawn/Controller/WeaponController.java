@@ -80,27 +80,7 @@ public class WeaponController {
         }
     }
 
-    private Monster getNearestMonster(float maxRange) {
-        float playerX = App.getInstance().getCurrentPlayer().getPlayerSprite().getX() + App.getInstance().getCurrentPlayer().getPlayerSprite().getWidth() / 2;
-        float playerY = App.getInstance().getCurrentPlayer().getPlayerSprite().getY() + App.getInstance().getCurrentPlayer().getPlayerSprite().getHeight() / 2;
 
-        Monster nearest = null;
-        float nearestDistSq = maxRange * maxRange;
-
-        for (Monster monster : App.getInstance().getMonsters()) {
-            if(monster.isDead())
-                continue;
-            float dx = monster.getPosX() - playerX;
-            float dy = monster.getPosY() - playerY;
-            float distSq = dx * dx + dy * dy;
-
-            if (distSq < nearestDistSq) {
-                nearestDistSq = distSq;
-                nearest = monster;
-            }
-        }
-        return nearest;
-    }
 
 
     public void update() {
@@ -108,9 +88,9 @@ public class WeaponController {
         Sprite sprite = weapon.getSprite();
         handlePlayerInput();
         shootCooldown -= Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyPressed(KeyBindings.MOVE_LEFT)) {
             if (sprite.getScaleY() > 0) sprite.setScale(1, -1); // flip horizontally
-        } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } else if (Gdx.input.isKeyPressed(KeyBindings.MOVE_RIGHT)) {
             if (sprite.getScaleY() < 0) sprite.setScale(1, 1); // unflip
         }
         sprite.setPosition(App.getInstance().getCurrentPlayer().getPosX(), App.getInstance().getCurrentPlayer().getPosY());
@@ -159,7 +139,7 @@ public class WeaponController {
     public void handlePlayerInput(){
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+        if (Gdx.input.isKeyPressed(KeyBindings.ACTION_RELOAD)) {
             weapon.reload();
             return;
         }
@@ -168,19 +148,12 @@ public class WeaponController {
             weapon.reload();
             return;
         }
-
-        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) && App.getInstance().isAutoReload()) && shootCooldown <= 0f) {
-            Monster monster = getNearestMonster(2000);
-            if (monster != null) {
-                float deltaX = monster.getPosX() - App.getInstance().getCurrentPlayer().getPosX();
-                float deltaY = monster.getPosY() - App.getInstance().getCurrentPlayer().getPosY();
-                float x = deltaX + Gdx.graphics.getWidth() / 2;
-                float y = -deltaY + Gdx.graphics.getHeight() / 2;
-
-                Gdx.input.setCursorPosition((int) x, (int) y);
-                handleWeaponShoot((int) x, (int) y);
-
-                shootCooldown = 0.5f; // reset cooldown
+        if (Gdx.input.isKeyPressed(KeyBindings.ACTION_AIM)){
+            if(App.getInstance().isAutoAim()){
+                App.getInstance().setAutoAim(false);
+            }
+            else{
+                App.getInstance().setAutoAim(true);
             }
         }
     }

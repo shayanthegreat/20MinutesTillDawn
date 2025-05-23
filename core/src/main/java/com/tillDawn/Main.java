@@ -47,9 +47,10 @@ public class Main extends Game {
 
         //setScreen(new RegisterMenuView(new RegisterMenuController(), GameAssetManager.getInstance().getSkin()));
         //setScreen(new GameView(new GameController(), GameAssetManager.getInstance().getSkin()));
-        setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+        //setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
         //setScreen(SettingView.getInstance());
         //setScreen(new PreGameView(new PreGameController(), GameAssetManager.getInstance().getSkin()));
+        setScreen(new KeyView());
     }
 
     @Override

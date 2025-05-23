@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.tillDawn.Main;
-import com.tillDawn.Model.App;
-import com.tillDawn.Model.GameAssetManager;
-import com.tillDawn.Model.Player;
-import com.tillDawn.Model.Tree;
+import com.tillDawn.Model.*;
 
 import java.util.ArrayList;
 
@@ -40,15 +37,15 @@ public class PlayerController {
         float speed = player.getSpeed();
         boolean moved = false;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (Gdx.input.isKeyPressed(KeyBindings.MOVE_DOWN)) {
             player.setPosY(oldY - speed);
             moved = true;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (Gdx.input.isKeyPressed(KeyBindings.MOVE_UP)) {
             player.setPosY(oldY + speed);
             moved = true;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(KeyBindings.MOVE_LEFT)) {
             player.setPosX(oldX - speed);
             moved = true;
             if (facingRight) {
@@ -56,7 +53,7 @@ public class PlayerController {
                 facingRight = false;
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (Gdx.input.isKeyPressed(KeyBindings.MOVE_RIGHT)) {
             player.setPosX(oldX + speed);
             moved = true;
             if (!facingRight) {

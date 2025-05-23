@@ -37,6 +37,7 @@ public class SettingView implements Screen {
     private final SettingController controller;
     private final SelectBox<String> musicTrackSelectBox;
     private final TextButton backButton;
+    private final TextButton nextButton;
     private Table table = new Table();
     public SettingView(SettingController controller, Skin skin) {
         this.skin = skin;
@@ -56,6 +57,7 @@ public class SettingView implements Screen {
         sfxOnCheckBox.setChecked(App.getInstance().isSfxSound());
         reloadOnCheckBox.setChecked(App.getInstance().isAutoReload());
         blackAndWhiteCheckBox.setChecked(false);
+        nextButton = new TextButton("Key Setting", skin);
     }
 
 
@@ -93,7 +95,13 @@ public class SettingView implements Screen {
         table.add(blackAndWhiteCheckBox).colspan(2);
         table.row();
 
-        addButton(backButton);
+        table.row().padTop(40);
+        applyHoverEffect(backButton);
+        applyHoverEffect(nextButton);
+        Table buttonRow = new Table();
+        buttonRow.add(backButton).width(400).padRight(20);
+        buttonRow.add(nextButton).width(400);
+        table.add(buttonRow).colspan(2).center();
         // === Listeners ===
         stage.addActor(table);
 
@@ -157,6 +165,11 @@ public class SettingView implements Screen {
         backButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
+        nextButton.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                Main.getInstance().setScreen(new KeyView()); // Replace with your actual KeyView constructor if needed
             }
         });
     }

@@ -3,38 +3,46 @@ package com.tillDawn.Controller;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.tillDawn.Main;
-import com.tillDawn.Model.App;
-import com.tillDawn.Model.CollisionRect;
-import com.tillDawn.Model.Monster;
-import com.tillDawn.Model.Player;
+import com.tillDawn.Model.*;
 
 import java.util.ArrayList;
 
 public class MonsterController {
-    float gameTime = 0f;            // Time since game started
+    float gameTime = 0f;
     float spawnTimer = 0f;
+    float spawnTimer2 = 0f;
+
     ArrayList<Monster> monsters = App.getInstance().getMonsters();// Time since last spawn
-    private void spawnMonster() {
-        float x = MathUtils.random(0, 800); // Choose spawn area as needed
-        float y = MathUtils.random(0, 600);
+    private void spawnMonster(MonsterType type) {
+        float x = MathUtils.random(-800, 800); // Choose spawn area as needed
+        float y = MathUtils.random(-600, 600);
         CollisionRect rect = new CollisionRect(x, y, 40, 40); // Example values
-        Monster monster = new Monster(x, y, 100, rect, 0, 30, 5);
+        Monster monster = new Monster(x, y, rect, 0, type);
         monsters.add(monster);
     }
 
     public void update(float deltaTime) {
         gameTime += deltaTime;
         spawnTimer += deltaTime;
-
+        spawnTimer2 += deltaTime;
+        float j = gameTime;
         if (spawnTimer >= 3f) {
-            float j = gameTime; // Total seconds since game started
-            int monstersToSpawn = (int) j / (5);
+             // Total seconds since game started
+            int monstersToSpawn = (int) j / (30);
 
             for (int i = 0; i < monstersToSpawn; i++) {
-                spawnMonster();
+                spawnMonster(MonsterType.Tentacle);
             }
 
             spawnTimer -= 3f; // Keep leftover time
+        }
+        if(spawnTimer2 >= 10f){
+            int totalTime = App.getInstance().getGameTime() * 60;
+            int monstersToSpawn = (4*(int)j- totalTime + 30)/30;
+            for (int i = 0; i < monstersToSpawn; i++) {
+                spawnMonster(MonsterType.EyeBat);
+            }
+            spawnTimer2 -= 10f;
         }
         Player player = App.getInstance().getCurrentPlayer();
         CollisionRect playerRect = player.getRect();
@@ -46,14 +54,22 @@ public class MonsterController {
             } else {
                 monster.damage(player);
             }
-
         }
 
+        for (Monster monster : monsters) {
+            if (!monster.isDead()) {
+                monster.draw(Main.getInstance().getBatch());
+            }
+        }
+        ArrayList<Monster> deadMonsters = new ArrayList<>();
         for(Monster monster : monsters) {
-            if(monster.isDead())
-                continue;
-            monster.getSprite().draw(Main.getInstance().getBatch());
+            if(monster.isDead()) {
+                deadMonsters.add(monster);
+            }
         }
+        for(Monster monster : deadMonsters) {
+            monsters.remove(monster);
+        }
+        player.setCurrentKills(deadMonsters.size() + player.getCurrentKills());
     }
-
 }

@@ -72,5 +72,6 @@ public class PreGameController extends Controller{
 
             }
         }
+        App.getInstance().setAutoAim(false);
     }
 }
