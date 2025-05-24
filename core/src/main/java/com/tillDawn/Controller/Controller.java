@@ -36,4 +36,13 @@ public class Controller {
         users.add(new User(username, password, question, answer));
         return new Result("Successfully registered user!", true);
     }
+
+    public User getUser(String username) {
+        for (User user : App.getInstance().getUsers()) {
+            if(user.getName().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
 }

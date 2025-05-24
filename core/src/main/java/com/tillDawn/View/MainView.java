@@ -14,10 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.tillDawn.Controller.MainController;
-import com.tillDawn.Controller.PreGameController;
-import com.tillDawn.Controller.ProfileController;
-import com.tillDawn.Controller.SettingController;
+import com.tillDawn.Controller.*;
 import com.tillDawn.Main;
 import com.tillDawn.Model.GameAssetManager;
 
@@ -107,6 +104,19 @@ public class MainView implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Main.getInstance().setScreen(new PreGameView(new PreGameController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
+        registerButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Main.getInstance().setScreen(new RegisterMenuView(new RegisterMenuController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
+
+        loginButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Main.getInstance().setScreen(new LoginMenuView(new LoginMenuController(), GameAssetManager.getInstance().getSkin()));
             }
         });
     }

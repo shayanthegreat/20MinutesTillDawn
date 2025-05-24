@@ -11,6 +11,8 @@ import com.tillDawn.Model.App;
 import com.tillDawn.Model.KeyBindings;
 import com.tillDawn.Model.Monster;
 
+import java.util.ArrayList;
+
 public class GameView implements Screen, InputProcessor {
     private Stage stage;
     private GameController gameController;
@@ -22,7 +24,7 @@ public class GameView implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if(KeyBindings.ACTION_CLICK == Input.Keys.NUM_LOCK){
+        if(KeyBindings.ACTION_CLICK == 0){
             return false;
         }
         if (keycode == KeyBindings.ACTION_CLICK) {
@@ -61,7 +63,7 @@ public class GameView implements Screen, InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-        if(KeyBindings.ACTION_CLICK != Input.Keys.NUM_LOCK){
+        if(KeyBindings.ACTION_CLICK != 0){
             return false;
         }
         if(App.getInstance().isAutoAim()){
@@ -121,9 +123,10 @@ public class GameView implements Screen, InputProcessor {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
-
         gameController.updateGame();
-
+        Main.getInstance().getBatch().begin();
+        drawMonster();
+        Main.getInstance().getBatch().end();
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }
@@ -151,5 +154,14 @@ public class GameView implements Screen, InputProcessor {
     @Override
     public void dispose() {
 
+    }
+
+    public void drawMonster(){
+        ArrayList<Monster> monsters = App.getInstance().getMonsters();
+        for (Monster monster : monsters) {
+            if (!monster.isDead()) {
+                monster.draw(Main.getInstance().getBatch());
+            }
+        }
     }
 }

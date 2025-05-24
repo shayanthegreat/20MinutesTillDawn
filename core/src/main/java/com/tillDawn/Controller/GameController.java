@@ -44,7 +44,7 @@ public class GameController {
         this.playerController = new PlayerController(App.getInstance().getCurrentPlayer());
         this.worldController = WorldController.getInstance(playerController);
         this.weaponController = new WeaponController();
-        this.monsterController = new MonsterController();
+        this.monsterController = new MonsterController(weaponController);
         font.setColor(Color.WHITE);
         font.getData().setScale(2); // Make it larger
     }

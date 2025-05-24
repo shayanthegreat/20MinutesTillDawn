@@ -9,27 +9,31 @@ public class Player {
     private Texture playerTexture = new Texture(Gdx.files.internal("player1-.png"));
     private Sprite playerSprite = new Sprite(playerTexture);
     private Weapon weapon = null;
-    private CharacterType characterType = null;
+    private CharacterType characterType;
     private float posX = 0;
     private float posY = 0;
-    private float playerHealth = 100;
-    private float maxHealth = 100;
+    private float playerHealth;
+    private float maxHealth;
     private CollisionRect rect;
     private float time = 0;
-    private float speed = 5;
-    public float getSpeed() {
-        return speed;
-    }
+    private float speed;
     private int currentKills;
     private boolean isPlayerIdle = true;
     private boolean isPlayerRunning = false;
     private boolean isDead = false;
-    public Player(){
+    private User user = null;
+    public Player(CharacterType characterType, Weapon weapon){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
         playerSprite.setSize(playerTexture.getWidth() / 7, playerTexture.getHeight() / 7);
         posX = (float) Gdx.graphics.getWidth() / 2;
         posY = (float) Gdx.graphics.getHeight() / 2;
         rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() / 7, playerTexture.getHeight() / 7);
+        this.characterType = characterType;
+        this.playerHealth = characterType.getHealth();
+        this.maxHealth = characterType.getHealth();
+        this.speed = characterType.getSpeed();
+        this.user = App.getInstance().getCurrentUser();
+        this.weapon = weapon;
     }
 
     public void updateHealth(float x){
@@ -40,7 +44,6 @@ public class Player {
         if(playerHealth <= 0){
             isDead = true;
         }
-        //System.out.println(playerHealth);
     }
 
     public Texture getPlayerTexture() {
@@ -138,5 +141,16 @@ public class Player {
 
     public void setCurrentKills(int currentKills) {
         this.currentKills = currentKills;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public User getUser() {
+        return user;
     }
 }

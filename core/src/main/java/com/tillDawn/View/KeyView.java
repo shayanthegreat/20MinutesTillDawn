@@ -2,6 +2,7 @@ package com.tillDawn.View;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -14,6 +15,8 @@ import com.tillDawn.Model.KeyBindings;
 public class KeyView implements Screen {
     private Stage stage;
     private Skin skin;
+    private Texture backgroundTexture;
+    private Image backgroundImage;
     private boolean waitingForKey = false;
     private String actionToRebind = null;
     private Label statusLabel;
@@ -33,8 +36,13 @@ public class KeyView implements Screen {
 
     @Override
     public void show() {
+        backgroundTexture = new Texture(Gdx.files.internal("menuBackground.jpg"));
+        backgroundImage = new Image(backgroundTexture);
+        backgroundImage.setFillParent(true);
         skin = GameAssetManager.getInstance().getSkin();
         stage = new Stage(new ScreenViewport());
+
+        stage.addActor(backgroundImage);
         Gdx.input.setInputProcessor(stage);
 
         table = new Table();

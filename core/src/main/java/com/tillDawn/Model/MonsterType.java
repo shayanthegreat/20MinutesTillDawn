@@ -8,14 +8,25 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.ArrayList;
 
 public enum MonsterType {
-    Tentacle("tentacle", 25, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("tentacle/TentacleSpawn0.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("tentacle/TentacleSpawn1.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("tentacle/TentacleSpawn2.png"))))),
+    Tentacle("tentacle", 25, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("tentacle/BrainMonster_0.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("tentacle/BrainMonster_1.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("tentacle/BrainMonster_2.png"))))),
     EyeBat("EyeBat", 50, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_0.png"))),
         new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_1.png"))),
         new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_2.png"))),
         new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_3.png"))))),
-    ;
+    Shub("Shub", 400, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_0.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_1.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_2.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_3.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_4.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_5.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_6.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_7.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_8.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_9.png"))),
+        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_10.png"))))),
+        ;
     private String name;
     private int hp;
     private Animation<TextureRegion> animation;

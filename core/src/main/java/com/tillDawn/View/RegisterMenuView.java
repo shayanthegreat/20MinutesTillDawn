@@ -3,6 +3,7 @@ package com.tillDawn.View;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.tillDawn.Controller.MainController;
 import com.tillDawn.Controller.RegisterMenuController;
 import com.tillDawn.Main;
 import com.tillDawn.Model.GameAssetManager;
@@ -25,7 +27,10 @@ public class RegisterMenuView implements Screen {
     private final TextField passwordField;
     private final SelectBox<String> securityQuestionBox;
     private final TextField securityAnswerField;
-
+    private Skin skin;
+    private final TextButton backButton;
+    private Texture backgroundTexture;
+    private Image backgroundImage;
     private final RegisterMenuController controller;
 
     public RegisterMenuView(RegisterMenuController controller, Skin skin) {
@@ -41,6 +46,7 @@ public class RegisterMenuView implements Screen {
         this.usernameField.setScale(0.7f);
         this.usernameField.setMessageText("Username");
 
+        this.backButton = new TextButton("Back", skin);
         this.passwordField = new TextField("", skin);
         this.passwordField.setScale(0.7f);
         this.passwordField.setMessageText("Password");
@@ -63,7 +69,11 @@ public class RegisterMenuView implements Screen {
 
     @Override
     public void show() {
+        backgroundTexture = new Texture(Gdx.files.internal("menuBackground.jpg"));
+        backgroundImage = new Image(backgroundTexture);
+        backgroundImage.setFillParent(true);
         stage = new Stage(new ScreenViewport());
+        stage.addActor(backgroundImage);
         Gdx.input.setInputProcessor(stage);
 
         table.setFillParent(true);
@@ -74,27 +84,37 @@ public class RegisterMenuView implements Screen {
         table.row();
 
         table.add(new Label("Username:", GameAssetManager.getInstance().getSkin())).right().pad(10);
-        table.add(usernameField).width(200);
+        table.add(usernameField).width(400).pad(10, 0, 10, 0);
         table.row();
 
         table.add(new Label("Password:", GameAssetManager.getInstance().getSkin())).right().pad(10);
-        table.add(passwordField).width(200);
+        table.add(passwordField).width(400).pad(10, 0, 10, 0);
         table.row();
 
         table.add(new Label("Security Question:", GameAssetManager.getInstance().getSkin())).right().pad(10);
-        table.add(securityQuestionBox).width(200);
+        table.add(securityQuestionBox).width(400).pad(10, 0, 10, 0);
         table.row();
 
         table.add(new Label("Answer:", GameAssetManager.getInstance().getSkin())).right().pad(10);
-        table.add(securityAnswerField).width(200);
+        table.add(securityAnswerField).width(400).pad(10, 0, 10, 0);
 
         table.row();
 
         table.add(errorLabel).colspan(2).padBottom(40);
 
+
         table.row();
 
-        table.add(registerButton).colspan(2).padTop(20);
+        table.add(registerButton).colspan(2).padTop(20).width(500).center();
+
+        table.row();
+
+        table.add(backButton).colspan(2).center().width(500).pad(10);
+        backButton.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
         registerButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -109,7 +129,7 @@ public class RegisterMenuView implements Screen {
                     Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
-                            Main.getInstance().setScreen(new RegisterMenuView(controller, GameAssetManager.getInstance().getSkin()));
+                            Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
                         }
                     }, 1);
                 }

@@ -17,7 +17,8 @@ public class Monster {
     private float speed;
     private float damage;
     private float stateTime = 0f;
-
+    private float shootTimer = 0f;
+    private MonsterType monsterType;
     private Animation<TextureRegion> animation;
 
     public Monster(float posX, float posY, CollisionRect rect, float time, MonsterType monsterType) {
@@ -28,6 +29,7 @@ public class Monster {
         this.time = time;
         this.speed = 15;
         this.damage = 10;
+        this.monsterType = monsterType;
         this.animation = monsterType.getAnimation();
     }
 
@@ -81,5 +83,20 @@ public class Monster {
 
     public float getPosY() {
         return posY;
+    }
+    public void updateShootTimer(float delta) {
+        shootTimer += delta;
+    }
+
+    public void resetShootTimer() {
+        shootTimer = 0f;
+    }
+
+    public boolean canShoot() {
+        return shootTimer >= 3f;
+    }
+
+    public MonsterType getMonsterType() {
+        return monsterType;
     }
 }

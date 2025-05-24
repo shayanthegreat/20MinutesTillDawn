@@ -7,7 +7,7 @@ public class KeyBindings {
     public static int MOVE_RIGHT = Input.Keys.D;
     public static int ACTION_RELOAD = Input.Keys.R;
     public static int ACTION_AIM = Input.Keys.SPACE;
-    public static int ACTION_CLICK = Input.Keys.NUM_LOCK;
+    public static int ACTION_CLICK = 0;
     public static void setBinding(String action, int keycode) {
         switch (action) {
             case "MOVE_LEFT": MOVE_LEFT = keycode; break;

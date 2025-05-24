@@ -9,8 +9,8 @@ public class App {
     private static App app;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
-    private Player currentPlayer = new Player();
-    private User currentUser = new User("shayan", "sabzi", "asdad", "asdasdasd");
+    private Player currentPlayer = null;
+    private User currentUser = new User("guest", "", "", "");
     private ArrayList<Tree> trees = new ArrayList<>();
     private final int TREE_COUNT = 900;
     private boolean autoReload = false;

@@ -19,6 +19,7 @@ public class WeaponController {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
     private ArrayList<Bullet> bullets = new ArrayList<>();
+    private ArrayList<Bullet> enemyBullets = new ArrayList<>();
     private float shootCooldown = 0f; // in seconds
     public void handleWeaponRotation(int x, int y) {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
@@ -80,9 +81,6 @@ public class WeaponController {
         }
     }
 
-
-
-
     public void update() {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
         Sprite sprite = weapon.getSprite();
@@ -134,6 +132,13 @@ public class WeaponController {
             shapeRenderer.end();
         }
         Main.getInstance().getBatch().begin();
+        for (Bullet bullet : enemyBullets) {
+            bullet.update();
+            if (bullet.getRect().collidesWith(App.getInstance().getCurrentPlayer().getRect())) {
+                App.getInstance().getCurrentPlayer().updateHealth(-1);
+            }
+            bullet.draw(Main.getInstance().getBatch());
+        }
     }
 
     public void handlePlayerInput(){
@@ -156,6 +161,10 @@ public class WeaponController {
                 App.getInstance().setAutoAim(true);
             }
         }
+    }
+
+    public void addEnemyBullet(Bullet bullet) {
+        enemyBullets.add(bullet);
     }
 
 
