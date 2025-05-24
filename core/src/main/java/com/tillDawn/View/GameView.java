@@ -1,15 +1,17 @@
 package com.tillDawn.View;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.tillDawn.Controller.CameraController;
 import com.tillDawn.Controller.GameController;
+import com.tillDawn.Controller.WorldController;
 import com.tillDawn.Main;
-import com.tillDawn.Model.App;
-import com.tillDawn.Model.KeyBindings;
-import com.tillDawn.Model.Monster;
+import com.tillDawn.Model.*;
 
 import java.util.ArrayList;
 
@@ -62,7 +64,6 @@ public class GameView implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
         if(KeyBindings.ACTION_CLICK != 0){
             return false;
         }
@@ -123,12 +124,20 @@ public class GameView implements Screen, InputProcessor {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
+        Main.getInstance().getBatch().begin();
+        Main.getInstance().getBatch().end();
         gameController.updateGame();
         Main.getInstance().getBatch().begin();
         drawMonster();
+        drawTree();
+        drawEgg();
+        if(gameController.getWorldController().getFence().isActive()){
+            drawFence();
+        }
         Main.getInstance().getBatch().end();
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
+        //System.out.println(App.getInstance().getCurrentPlayer().getPlayerHealth());
     }
 
     @Override
@@ -156,12 +165,61 @@ public class GameView implements Screen, InputProcessor {
 
     }
 
-    public void drawMonster(){
+    public void drawMonster() {
         ArrayList<Monster> monsters = App.getInstance().getMonsters();
+
+        CameraController camController = CameraController.getCameraController();
+        float camX = camController.getCamera().position.x;
+        float camY = camController.getCamera().position.y;
+        float viewWidth = camController.getCamera().viewportWidth;
+        float viewHeight = camController.getCamera().viewportHeight;
+
+        float left = camX - viewWidth / 2 - 500;
+        float right = camX + viewWidth / 2 + 500;
+        float bottom = camY - viewHeight / 2 - 500;
+        float top = camY + viewHeight / 2 + 500;
+
         for (Monster monster : monsters) {
             if (!monster.isDead()) {
-                monster.draw(Main.getInstance().getBatch());
+                float x = monster.getPosX();
+                float y = monster.getPosY();
+                float width = monster.getMonsterType().getWidth();
+                float height = monster.getMonsterType().getHeight();
+
+                boolean isVisible = x + width > left && x < right && y + height > bottom && y < top;
+
+                if (isVisible) {
+                    monster.draw(Main.getInstance().getBatch());
+                }
             }
         }
+    }
+
+
+    public void drawTree(){
+        for (Tree tree : App.getInstance().getTrees()) {
+                tree.update(Gdx.graphics.getDeltaTime());
+                tree.draw(Main.getInstance().getBatch());
+        }
+    }
+
+    public void drawEgg(){
+        ArrayList<Egg> collectedEgg = new ArrayList<>();
+        for (Egg egg : WorldController.getInstance().getEggs()) {
+            if(egg.isCollected()){
+                collectedEgg.add(egg);
+                continue;
+            }
+            egg.render(Main.getInstance().getBatch());
+        }
+        for (Egg egg : collectedEgg) {
+            WorldController.getInstance().getEggs().remove(egg);
+        }
+    }
+    public void drawFence(){
+        WorldController worldController = gameController.getWorldController();
+        ShapeRenderer shapeRenderer = worldController.getShapeRenderer();
+        shapeRenderer.setProjectionMatrix(CameraController.getCameraController().getCamera().combined);
+        worldController.getFence().render(shapeRenderer);
     }
 }

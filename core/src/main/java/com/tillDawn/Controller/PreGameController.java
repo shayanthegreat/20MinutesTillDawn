@@ -1,9 +1,11 @@
 package com.tillDawn.Controller;
 
-import com.tillDawn.Model.App;
-import com.tillDawn.Model.CharacterType;
-import com.tillDawn.Model.Player;
-import com.tillDawn.Model.Weapon;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
+import com.tillDawn.Model.*;
+
+import java.util.ArrayList;
 
 public class PreGameController extends Controller{
     public void startGame(int x, int y, int z){
@@ -75,5 +77,37 @@ public class PreGameController extends Controller{
         App.getInstance().setAutoAim(false);
         App.getInstance().setCurrentPlayer(new Player(characterType, weapon));
         App.getInstance().getCurrentPlayer().setUser(App.getInstance().getCurrentUser());
+        int numTrees = 200;
+        float minDistance = 150f; // Minimum allowed distance between trees
+
+        ArrayList<Tree> trees = App.getInstance().getTrees();
+        Texture treeTexture = GameAssetManager.getInstance().getTreeTexture();
+
+        int attempts = 0;
+        int maxAttempts = numTrees * 10; // prevent infinite loop
+        while (trees.size() < numTrees && attempts < maxAttempts) {
+            float t = MathUtils.random(-8000, 8000);
+            float w = MathUtils.random(-6000, 6000);
+
+            boolean tooClose = false;
+            for (Tree other : trees) {
+                float dx = other.getWorldX() - t;
+                float dy = other.getWorldY() - w;
+                if (dx * dx + dy * dy < minDistance * minDistance) {
+                    tooClose = true;
+                    break;
+                }
+            }
+
+            if (!tooClose) {
+                Sprite sprite = new Sprite(treeTexture);
+                sprite.setSize(140, 182);
+                sprite.setPosition(t, w);
+                trees.add(new Tree(sprite, t, w));
+            }
+
+            attempts++;
+        }
+
     }
 }

@@ -24,10 +24,10 @@ public class Player {
     private User user = null;
     public Player(CharacterType characterType, Weapon weapon){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
-        playerSprite.setSize(playerTexture.getWidth() / 7, playerTexture.getHeight() / 7);
+        playerSprite.setSize(60, 80);
         posX = (float) Gdx.graphics.getWidth() / 2;
         posY = (float) Gdx.graphics.getHeight() / 2;
-        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() / 7, playerTexture.getHeight() / 7);
+        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), 60, 80);
         this.characterType = characterType;
         this.playerHealth = characterType.getHealth();
         this.maxHealth = characterType.getHealth();
@@ -37,6 +37,7 @@ public class Player {
     }
 
     public void updateHealth(float x){
+        x *= Gdx.graphics.getDeltaTime();
         playerHealth += x;
         if(playerHealth > maxHealth){
             playerHealth = maxHealth;
@@ -152,5 +153,10 @@ public class Player {
     }
     public User getUser() {
         return user;
+    }
+
+    public void setPosition(float x, float y) {
+        this.posX = x;
+        this.posY = y;
     }
 }

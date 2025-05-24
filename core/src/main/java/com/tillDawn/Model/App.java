@@ -12,7 +12,6 @@ public class App {
     private Player currentPlayer = null;
     private User currentUser = new User("guest", "", "", "");
     private ArrayList<Tree> trees = new ArrayList<>();
-    private final int TREE_COUNT = 900;
     private boolean autoReload = false;
     private boolean sfxSound = false;
     private boolean musicSound = false;
@@ -20,14 +19,7 @@ public class App {
     private boolean autoAim;
     ArrayList<Monster> monsters = new ArrayList<>();
     public App() {
-        for (int i = 0; i < TREE_COUNT; i++) {
-            float x = MathUtils.random(-8000, 8000);
-            float y = MathUtils.random(-6000, 6000);
-            Sprite tree = new Sprite(GameAssetManager.getInstance().getTreeTexture());
-            tree.setSize(43, 43);
-            tree.setPosition(x, y);
-            trees.add(new Tree(tree, x, y));
-        }
+
     }
 
     public static App getInstance() {
@@ -108,4 +100,6 @@ public class App {
     public void setAutoAim(boolean autoAim) {
         this.autoAim = autoAim;
     }
+
+
 }

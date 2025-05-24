@@ -19,10 +19,14 @@ public class MonsterController {
         this.weaponController = weaponController;
     }
     private void spawnMonster(MonsterType type) {
-        float x = MathUtils.random(-800, 800); // Choose spawn area as needed
-        float y = MathUtils.random(-600, 600);
-        CollisionRect rect = new CollisionRect(x, y, 40, 40); // Example values
-        Monster monster = new Monster(x, y, rect, 0, type);
+        Player player = App.getInstance().getCurrentPlayer();
+        float x = MathUtils.random(-1500+player.getPosX(), 1500+player.getPosX()); // Choose spawn area as needed
+        float y = MathUtils.random(-1500+player.getPosY(), 1500+player.getPosY());
+        if(type == MonsterType.Shub){
+            x = MathUtils.random(-800+player.getPosX(), 800+player.getPosX()); // Choose spawn area as needed
+            y = MathUtils.random(-1200+player.getPosY(), 1200+player.getPosY());
+        }
+        Monster monster = new Monster(x, y, 0, type);
         monsters.add(monster);
     }
 
@@ -48,7 +52,7 @@ public class MonsterController {
             }
             spawnTimer2 -= 10f;
         }
-        if(gameTime >= App.getInstance().getGameTime() / 2f && !isHalf) {
+        if(gameTime >= App.getInstance().getGameTime() * 30 && !isHalf) {
             spawnMonster(MonsterType.Shub);
             isHalf = true;
         }
@@ -57,10 +61,19 @@ public class MonsterController {
         // Update all monsters
         for (Monster monster : monsters) {
             CollisionRect monsterRect = monster.getRect();
-            if (!monsterRect.collidesWith(playerRect)) {
-                monster.update(deltaTime, player.getPosX(), player.getPosY()); // Move toward player
-            } else {
-                monster.damage(player);
+            if (monster.getMonsterType() == MonsterType.Shub) {
+                monster.update(deltaTime, player.getPosX(), player.getPosY());
+
+                if (monster.getRect().collidesWith(playerRect)) {
+                    monster.damage(player);
+                }
+            }
+            else{
+                if (!monsterRect.collidesWith(playerRect)) {
+                    monster.update(deltaTime, player.getPosX(), player.getPosY()); // Move toward player
+                } else {
+                    monster.damage(player);
+                }
             }
             if (monster.getMonsterType() == MonsterType.EyeBat) {
                 monster.updateShootTimer(deltaTime);
@@ -78,6 +91,8 @@ public class MonsterController {
             }
         }
         for(Monster monster : deadMonsters) {
+            if(monster.getMonsterType() == MonsterType.Shub)
+                WorldController.getInstance().getFence().deactivate();
             monsters.remove(monster);
         }
         player.setCurrentKills(deadMonsters.size() + player.getCurrentKills());
@@ -88,7 +103,7 @@ public class MonsterController {
         float startY = monster.getPosY();
         Vector2 direction = new Vector2(player.getPosX() - startX, player.getPosY() - startY).nor();
 
-        Bullet bullet = new Bullet(5, startX, startY, direction); // You can adjust damage
+        Bullet bullet = new Bullet(1, startX, startY, direction); // You can adjust damage
         weaponController.addEnemyBullet(bullet);
     }
 }
