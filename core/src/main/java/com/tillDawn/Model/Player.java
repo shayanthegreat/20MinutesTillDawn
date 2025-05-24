@@ -8,30 +8,36 @@ public class Player {
 
     private Texture playerTexture = new Texture(Gdx.files.internal("player1-.png"));
     private Sprite playerSprite = new Sprite(playerTexture);
-    private Weapon weapon = new Weapon("Shotgun");
-
+    private Weapon weapon = null;
+    private CharacterType characterType;
     private float posX = 0;
     private float posY = 0;
-    private float playerHealth = 100;
-    private float maxHealth = 100;
+    private float playerHealth;
+    private float maxHealth;
     private CollisionRect rect;
     private float time = 0;
-    private float speed = 5;
-
-    public float getSpeed() {
-        return speed;
-    }
-
+    private float speed;
+    private int currentKills;
     private boolean isPlayerIdle = true;
     private boolean isPlayerRunning = false;
     private boolean isDead = false;
-    public Player(){
+    private User user = null;
+    public Player(CharacterType characterType, Weapon weapon){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
-        playerSprite.setSize(playerTexture.getWidth() / 9, playerTexture.getHeight() / 9);
-        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), playerTexture.getWidth() / 9, playerTexture.getHeight() / 9);
+        playerSprite.setSize(60, 80);
+        posX = (float) Gdx.graphics.getWidth() / 2;
+        posY = (float) Gdx.graphics.getHeight() / 2;
+        rect = new CollisionRect((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight(), 60, 80);
+        this.characterType = characterType;
+        this.playerHealth = characterType.getHealth();
+        this.maxHealth = characterType.getHealth();
+        this.speed = characterType.getSpeed();
+        this.user = App.getInstance().getCurrentUser();
+        this.weapon = weapon;
     }
 
     public void updateHealth(float x){
+        x *= Gdx.graphics.getDeltaTime();
         playerHealth += x;
         if(playerHealth > maxHealth){
             playerHealth = maxHealth;
@@ -39,7 +45,6 @@ public class Player {
         if(playerHealth <= 0){
             isDead = true;
         }
-        //System.out.println(playerHealth);
     }
 
     public Texture getPlayerTexture() {
@@ -117,5 +122,41 @@ public class Player {
 
     public Weapon getWeapon() {
         return weapon;
+    }
+
+    public CharacterType getCharacterType() {
+        return characterType;
+    }
+
+    public void setCharacterType(CharacterType characterType) {
+        this.characterType = characterType;
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    public int getCurrentKills() {
+        return currentKills;
+    }
+
+    public void setCurrentKills(int currentKills) {
+        this.currentKills = currentKills;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setPosition(float x, float y) {
+        this.posX = x;
+        this.posY = y;
     }
 }

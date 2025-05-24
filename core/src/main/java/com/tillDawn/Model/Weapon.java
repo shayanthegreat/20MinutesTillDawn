@@ -101,4 +101,5 @@ public class Weapon {
     public int getAmmoDamage() {
         return ammoDamage;
     }
+
 }

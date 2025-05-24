@@ -5,12 +5,13 @@ public class User {
     private String password;
     private String question;
     private String answer;
-
+    private String avatarPath;
     public User(String name, String password, String question, String answer) {
         this.name = name;
         this.password = password;
         this.question = question;
         this.answer = answer;
+        this.avatarPath = "avatar/Avatar1.png";
     }
 
     public String getName() {
@@ -43,5 +44,13 @@ public class User {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    public String getAvatarPath() {
+        return avatarPath;
+    }
+
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath;
     }
 }

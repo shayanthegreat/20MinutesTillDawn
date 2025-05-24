@@ -9,21 +9,17 @@ public class App {
     private static App app;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
-    private Player currentPlayer = new Player();
+    private Player currentPlayer = null;
+    private User currentUser = new User("guest", "", "", "");
     private ArrayList<Tree> trees = new ArrayList<>();
-    private final int TREE_COUNT = 500;
     private boolean autoReload = false;
-
+    private boolean sfxSound = false;
+    private boolean musicSound = false;
+    private int gameTime;
+    private boolean autoAim;
     ArrayList<Monster> monsters = new ArrayList<>();
     public App() {
-        for (int i = 0; i < TREE_COUNT; i++) {
-            float x = MathUtils.random(-6000, 6000);
-            float y = MathUtils.random(-3000, 3000);
-            Sprite tree = new Sprite(GameAssetManager.getInstance().getTreeTexture());
-            tree.setSize(43, 43);
-            tree.setPosition(x, y);
-            trees.add(new Tree(tree, x, y));
-        }
+
     }
 
     public static App getInstance() {
@@ -60,5 +56,50 @@ public class App {
     public ArrayList<Monster> getMonsters() {
         return monsters;
     }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public boolean isSfxSound() {
+        return sfxSound;
+    }
+
+    public void setSfxSound(boolean sfxSound) {
+        this.sfxSound = sfxSound;
+    }
+
+    public boolean isMusicSound() {
+        return musicSound;
+    }
+
+    public void setMusicSound(boolean musicSound) {
+        this.musicSound = musicSound;
+    }
+
+    public int getGameTime() {
+        return gameTime;
+    }
+
+    public void setGameTime(int gameTime) {
+        this.gameTime = gameTime;
+    }
+
+    public boolean isAutoAim() {
+        return autoAim;
+    }
+
+    public void setAutoAim(boolean autoAim) {
+        this.autoAim = autoAim;
+    }
+
 
 }
