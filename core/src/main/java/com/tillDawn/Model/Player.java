@@ -21,6 +21,11 @@ public class Player {
     private boolean isPlayerIdle = true;
     private boolean isPlayerRunning = false;
     private boolean isDead = false;
+    private boolean speedBoosted = false;
+    private float boostTimeLeft = 0;
+    private boolean damageBoosted = false;
+    private float damageBoostedLeft = 0;
+    private float originalSpeed;
     private User user = null;
     public Player(CharacterType characterType, Weapon weapon){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
@@ -158,5 +163,54 @@ public class Player {
     public void setPosition(float x, float y) {
         this.posX = x;
         this.posY = y;
+    }
+
+    public void doubleSpeedFor10Seconds() {
+        if (!speedBoosted) {
+            originalSpeed = speed;
+            speed *= 2;
+            boostTimeLeft = 10f;
+            speedBoosted = true;
+        }
+    }
+
+    public void update(float deltaTime) {
+        updateBoost(deltaTime);
+        increaseDamageUpdate(deltaTime);
+    }
+    public void updateBoost(float deltaTime) {
+        if (speedBoosted) {
+            boostTimeLeft -= deltaTime;
+            if (boostTimeLeft <= 0) {
+                speed = originalSpeed;
+                speedBoosted = false;
+                boostTimeLeft = 0;
+            }
+        }
+    }
+
+    public void addMaxHealth(float maxHealth) {
+        this.maxHealth += maxHealth;
+    }
+
+    public void increaseDamageFor10Seconds() {
+        if (!damageBoosted) {
+            damageBoostedLeft = 10f;
+            damageBoosted = true;
+        }
+    }
+
+    public void increaseDamageUpdate(float deltaTime) {
+        if (damageBoosted) {
+            damageBoostedLeft -= deltaTime;
+            if (damageBoostedLeft <= 0) {
+                damageBoosted = false;
+                damageBoostedLeft = 0;
+            }
+        }
+    }
+
+    public boolean isDamageBoosted() {
+        return damageBoosted;
     }
 }

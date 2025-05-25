@@ -192,7 +192,7 @@ public class PreGameView implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 controller.startGame(weaponIndex[0], currentIndex[0], selectedGameTimeIndex[0]);
-                Main.getInstance().setScreen(new GameView(new GameController(), GameAssetManager.getInstance().getSkin()));
+                Main.getInstance().setScreen(new GameView(GameController.getInstance(), GameAssetManager.getInstance().getSkin()));
             }
         });
 

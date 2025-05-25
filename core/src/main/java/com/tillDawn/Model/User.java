@@ -1,17 +1,24 @@
 package com.tillDawn.Model;
 
+import com.tillDawn.Controller.GameController;
+import com.tillDawn.View.GameView;
+
 public class User {
     private String name;
     private String password;
     private String question;
     private String answer;
     private String avatarPath;
+    private int xp;
+    private int level;
     public User(String name, String password, String question, String answer) {
         this.name = name;
         this.password = password;
         this.question = question;
         this.answer = answer;
         this.avatarPath = "avatar/Avatar1.png";
+        this.xp = 18;
+        this.level = 1;
     }
 
     public String getName() {
@@ -52,5 +59,26 @@ public class User {
 
     public void setAvatarPath(String avatarPath) {
         this.avatarPath = avatarPath;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void increaseXp(int xp) {
+        this.xp += xp;
+        if(this.xp >= level * 20){
+            this.xp -= level * 20;
+            GameController.getInstance().pauseGame();
+            level++;
+        }
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

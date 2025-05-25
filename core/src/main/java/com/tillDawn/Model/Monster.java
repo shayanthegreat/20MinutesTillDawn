@@ -61,8 +61,6 @@ public class Monster {
     }
 
     public void update(float deltaTime, float playerX, float playerY) {
-        stateTime += deltaTime;
-
         if (monsterType == MonsterType.Shub) {
             dashTimer += deltaTime;
 
@@ -143,6 +141,7 @@ public class Monster {
     }
 
     public void draw(SpriteBatch batch) {
+        stateTime += Gdx.graphics.getDeltaTime();
         TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
 
         if(monsterType == MonsterType.Shub){

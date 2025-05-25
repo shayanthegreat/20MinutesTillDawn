@@ -36,7 +36,7 @@ public class MonsterController {
         spawnTimer2 += deltaTime;
         float j = gameTime;
         if (spawnTimer >= 3f) {
-            int monstersToSpawn = (int) j / (30);
+            int monstersToSpawn = (int) j / (1);
 
             for (int i = 0; i < monstersToSpawn; i++) {
                 spawnMonster(MonsterType.Tentacle);

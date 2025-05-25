@@ -14,6 +14,7 @@ public class Weapon {
     private float reloadTime; // in seconds
     private float reloadTimer;
     private int ammoDamage;
+    private int projectile;
     public Weapon(String name) {
         switch (name) {
             case "Revolver":
@@ -22,6 +23,7 @@ public class Weapon {
                 maxAmmo = 6;
                 reloadTime = 1;
                 ammoDamage = 20;
+                projectile = 1;
                 break;
             case "Smg":{
                 this.name = "Smg";
@@ -29,6 +31,7 @@ public class Weapon {
                 maxAmmo = 24;
                 reloadTime = 2;
                 ammoDamage = 8;
+                projectile = 1;
                 break;
             }
             case "Shotgun":{
@@ -37,6 +40,7 @@ public class Weapon {
                 maxAmmo = 8;
                 reloadTime = 1;
                 ammoDamage = 10;
+                projectile = 4;
                 break;
             }
             default: {
@@ -47,7 +51,6 @@ public class Weapon {
         this.ammo = maxAmmo;
         this.isReloading = false;
         this.reloadTimer = 0f;
-
         sprite = new Sprite(texture);
         sprite.setX((float) Gdx.graphics.getWidth() / 2);
         sprite.setY((float) Gdx.graphics.getHeight() / 2);
@@ -98,8 +101,18 @@ public class Weapon {
         return name;
     }
 
+    public int getProjectile() {
+        return projectile;
+    }
+
+    public void addProjectile() {
+        this.projectile++;
+    }
+
     public int getAmmoDamage() {
         return ammoDamage;
     }
-
+    public void addMaxAmmo() {
+        this.maxAmmo+=5;
+    }
 }

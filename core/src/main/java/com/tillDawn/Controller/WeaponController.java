@@ -57,28 +57,27 @@ public class WeaponController {
 
         Vector2 baseDirection = new Vector2(worldMouse.x - startX, worldMouse.y - startY).nor();
 
-        if (weapon.getName().equalsIgnoreCase("Shotgun")) {
-            int pelletCount = 4;
-            int ammoToUse = Math.min(pelletCount, weapon.getAmmo());
-
-            for (int i = 0; i < ammoToUse; i++) {
-                float angleOffset = -12f + (i * 8f);
-                Vector2 spreadDir = baseDirection.cpy().rotateDeg(angleOffset).nor();
-
-                Bullet pellet = new Bullet(weapon.getAmmoDamage(), startX, startY, spreadDir);
-                pellet.getSprite().setOriginCenter();
-                pellet.getSprite().setRotation(spreadDir.angleDeg());
-                bullets.add(pellet);
-            }
-
-            weapon.setAmmo(weapon.getAmmo() - ammoToUse);
-        } else {
+        int ammoToUse = Math.min(weapon.getProjectile(), weapon.getAmmo());
+        if (ammoToUse % 2 == 0) {
             Bullet newBullet = new Bullet(weapon.getAmmoDamage(), startX, startY, baseDirection);
             newBullet.getSprite().setOriginCenter();
             newBullet.getSprite().setRotation(baseDirection.angleDeg());
             bullets.add(newBullet);
             weapon.setAmmo(weapon.getAmmo() - 1);
+            ammoToUse--;
         }
+        for (int i = 0; i < ammoToUse; i++) {
+            float angleOffset = -6f + (i * 4f);
+            Vector2 spreadDir = baseDirection.cpy().rotateDeg(angleOffset).nor();
+
+            Bullet pellet = new Bullet(weapon.getAmmoDamage(), startX, startY, spreadDir);
+            pellet.getSprite().setOriginCenter();
+            pellet.getSprite().setRotation(spreadDir.angleDeg());
+            bullets.add(pellet);
+        }
+
+        weapon.setAmmo(weapon.getAmmo() - ammoToUse);
+
     }
 
     public void update() {

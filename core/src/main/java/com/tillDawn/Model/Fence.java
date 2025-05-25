@@ -3,7 +3,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 public class Fence {
     private Rectangle bounds;
-    private float shrinkRate = 20f; // pixels per second
+    private float shrinkRate = 10f; // pixels per second
     private boolean active = false;
     private float damagePerSecond = 20f;
     private boolean wasActive = false;

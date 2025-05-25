@@ -82,13 +82,17 @@ public class WorldController {
             }
         }
 
-        playerController.update();
-
+        ArrayList<Egg> collectedEgg = new ArrayList<>();
         for (Egg egg : eggs) {
             if (App.getInstance().getCurrentPlayer().getRect().collidesWith(egg.getRect())) {
                 egg.setCollected(true);
-                System.out.println("Egg collected!");
+                collectedEgg.add(egg);
+                User user = App.getInstance().getCurrentUser();
+                user.increaseXp(3);
             }
+        }
+        for (Egg egg : collectedEgg) {
+            eggs.remove(egg);
         }
         elapsedTime += delta;
 
@@ -96,7 +100,8 @@ public class WorldController {
             fence = new Fence(1920, 1080, App.getInstance().getCurrentPlayer().getPosX(), App.getInstance().getCurrentPlayer().getPosY());
             fence.activate();
         }
-        fence.update(delta);
+        if(!GameController.getInstance().isPaused())
+            fence.update(delta);
         fence.checkCollision(App.getInstance().getCurrentPlayer(), delta);
     }
 

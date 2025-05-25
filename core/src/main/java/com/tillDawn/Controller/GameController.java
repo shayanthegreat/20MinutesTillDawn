@@ -11,13 +11,23 @@ import com.tillDawn.View.GameView;
 
 
 public class GameController {
+
+    private static GameController gameController;
     private GameView view;
     private WorldController worldController;
     private PlayerController playerController;
     private WeaponController weaponController;
     private MonsterController monsterController;
     private float elapsedTime = 0f;
-    private BitmapFont font = new BitmapFont();
+    private float lastTime;
+    private boolean paused = false;
+
+    public static GameController getInstance() {
+        if (gameController == null) {
+            gameController = new GameController();
+        }
+        return gameController;
+    }
     public Monster getNearestMonster(float maxRange) {
         float playerX = App.getInstance().getCurrentPlayer().getPlayerSprite().getX() + App.getInstance().getCurrentPlayer().getPlayerSprite().getWidth() / 2;
         float playerY = App.getInstance().getCurrentPlayer().getPlayerSprite().getY() + App.getInstance().getCurrentPlayer().getPlayerSprite().getHeight() / 2;
@@ -45,44 +55,37 @@ public class GameController {
         this.worldController = WorldController.getInstance(playerController);
         this.weaponController = new WeaponController();
         this.monsterController = new MonsterController(weaponController);
-        font.setColor(Color.WHITE);
-        font.getData().setScale(2); // Make it larger
+         // Make it larger
     }
 
     public void updateGame(){
 
         if(view != null){
             elapsedTime += Gdx.graphics.getDeltaTime();
+            if(!paused)
+                lastTime = elapsedTime;
             Main.getInstance().getBatch().begin();
             worldController.update();
-            playerController.update();
-            weaponController.update();
-            monsterController.update(Gdx.graphics.getDeltaTime());
-            font.draw(
-                Main.getInstance().getBatch(),
-                String.format("Time: %.0f", elapsedTime),
-                CameraController.getCameraController().getCamera().position.x - CameraController.getCameraController().getCamera().viewportWidth / 2 + 20,
-                CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 20
-            );
-            font.draw(Main.getInstance().getBatch(),
-                String.format("Kill : %d",App.getInstance().getCurrentPlayer().getCurrentKills()),
-                CameraController.getCameraController().getCamera().position.x - CameraController.getCameraController().getCamera().viewportWidth / 2 + 25,
-                CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 60
-                );
-            font.draw(Main.getInstance().getBatch(),
-                String.format("Ammo : %d",App.getInstance().getCurrentPlayer().getWeapon().getAmmo()),
-                CameraController.getCameraController().getCamera().position.x - CameraController.getCameraController().getCamera().viewportWidth / 2 + 25,
-                CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 100
-            );
-            font.draw(
-                Main.getInstance().getBatch(),
-                String.format("Left Time: %.0f", App.getInstance().getGameTime() * 60 - elapsedTime),
-                CameraController.getCameraController().getCamera().position.x + 750,
-                CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 20
-            );
+            if(!gameController.isPaused()){
+                playerController.update();
+                weaponController.update();
+                monsterController.update(Gdx.graphics.getDeltaTime());
+            }
             Main.getInstance().getBatch().end();
         }
     }
+
+
+    public void pauseGame() {
+        paused = true;
+    }
+
+    public void resumeGame() {
+        elapsedTime = lastTime;
+        paused = false;
+    }
+
+
 
     public WorldController getWorldController() {
         return worldController;
@@ -94,5 +97,13 @@ public class GameController {
 
     public WeaponController getWeaponController() {
         return weaponController;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public float getLastTime() {
+        return lastTime;
     }
 }

@@ -19,6 +19,7 @@ public class PlayerController {
     }
 
     public void update() {
+        player.update(Gdx.graphics.getDeltaTime());
         boolean isMoving = handlePlayerInput();
         if (!isMoving) {
             idleAnimation();

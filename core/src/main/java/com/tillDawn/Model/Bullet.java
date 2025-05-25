@@ -14,7 +14,7 @@ public class Bullet {
     private CollisionRect rect;
     private Vector2 position;
     private Vector2 direction;
-    private float speed = 500f;
+    private float speed = 1000f;
     public Bullet(int damage, float x, float y, Vector2 direction) {
         this.damage = damage;
         this.position = new Vector2(x, y);
@@ -38,6 +38,9 @@ public class Bullet {
 
     public void monsterHit(Monster monster) {
         float x = (float) damage;
+        if(App.getInstance().getCurrentPlayer().isDamageBoosted()){
+            x += damage/4f;
+        }
         monster.updateHealth(x);
     }
     public void draw(Batch batch) {
