@@ -19,7 +19,7 @@ public class App {
     private boolean autoAim;
     ArrayList<Monster> monsters = new ArrayList<>();
     public App() {
-
+        loadUsersFromJson("users.json");
     }
 
     public static App getInstance() {
@@ -101,5 +101,32 @@ public class App {
         this.autoAim = autoAim;
     }
 
+    public void loadUsersFromJson(String path) {
+        this.users = UserSaver.loadUsers(path);
+    }
 
+    public void saveUsersToJson(String path) {
+        UserSaver.saveUsers(this.users, path);
+    }
+
+    public void AppCloser(){
+        UserSaver.saveUsers(users, "users.json");
+    }
+
+//    public void updateOrAddCurrentUser(String path) {
+//        boolean updated = false;
+//        for (int i = 0; i < users.size(); i++) {
+//            if (users.get(i).getName().equals(currentUser.getName())) {
+//                users.set(i, currentUser);
+//                updated = true;
+//                break;
+//            }
+//        }
+//
+//        if (!updated && !currentUser.getName().equals("guest")) {
+//            users.add(currentUser);
+//        }
+//
+//        saveUsersToJson(path);
+//    }
 }

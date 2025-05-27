@@ -6,14 +6,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.tillDawn.Controller.CameraController;
-import com.tillDawn.Controller.GameController;
-import com.tillDawn.Controller.WorldController;
+import com.tillDawn.Controller.*;
 import com.tillDawn.Main;
 import com.tillDawn.Model.*;
 import com.tillDawn.Model.Tree;
@@ -28,15 +28,18 @@ public class GameView implements Screen, InputProcessor {
     private BitmapFont font = new BitmapFont();
     private boolean levelUpPopupShown = false;
     private boolean pauseMenuButton = false;
+    private boolean winOrLoseButton = false;
     TextButton giveUpButton;
+    private Player player;
     public GameView(GameController gameController, Skin skin) {
         this.gameController = gameController;
         gameController.setView(this);
         font.setColor(Color.WHITE);
         font.getData().setScale(2);
-        giveUpButton = new TextButton("PauseMenu", skin);
+        giveUpButton = new TextButton("Pause", skin);
         giveUpButton.setWidth(350);
         giveUpButton.setHeight(100);
+        player = App.getInstance().getCurrentPlayer();
     }
 
     @Override
@@ -52,7 +55,7 @@ public class GameView implements Screen, InputProcessor {
                 Monster monster = gameController.getNearestMonster(2000);
                 if (monster != null) {
                     float deltaX = monster.getPosX() - App.getInstance().getCurrentPlayer().getPosX();
-                    float deltaY = monster.getPosY() - App.getInstance().getCurrentPlayer().getPosY();
+                    float deltaY = monster.getPosY() - player.getPosY();
                     float x = deltaX + Gdx.graphics.getWidth() / 2;
                     float y = -deltaY + Gdx.graphics.getHeight() / 2;
 
@@ -90,8 +93,8 @@ public class GameView implements Screen, InputProcessor {
         if(App.getInstance().isAutoAim()){
             Monster monster = gameController.getNearestMonster(2000);
             if (monster != null) {
-                float deltaX = monster.getPosX() - App.getInstance().getCurrentPlayer().getPosX();
-                float deltaY = monster.getPosY() - App.getInstance().getCurrentPlayer().getPosY();
+                float deltaX = monster.getPosX() - player.getPosX();
+                float deltaY = monster.getPosY() - player.getPosY();
                 float x = deltaX + Gdx.graphics.getWidth() / 2;
                 float y = -deltaY + Gdx.graphics.getHeight() / 2;
 
@@ -155,11 +158,12 @@ public class GameView implements Screen, InputProcessor {
         stage.addActor(topTable);
 
 
-        giveUpButton.addListener(new ChangeListener() {
+        giveUpButton.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                // Define what happens when Give Up is pressed
-                Gdx.app.exit(); // Example: Exit the game
+            public void clicked(InputEvent event, float x, float y) {
+                gameController.pauseGame();
+                showPausePopup();
+                pauseMenuButton = true;
             }
         });
 
@@ -183,12 +187,20 @@ public class GameView implements Screen, InputProcessor {
         drawMonster();
         drawTree();
         drawEgg();
+        drawHealth();
+        System.out.println(player.getPlayerHealth());
         if (gameController.getWorldController().getFence().isActive()) {
             drawFence();
         }
+        if(gameController.getLastTime() >= App.getInstance().getGameTime() * 30 && !winOrLoseButton){
+            showWin();
+        }
+        if(player.isDead() && !winOrLoseButton){
+            showLose();
+        }
         Main.getInstance().getBatch().end();
         drawLevelBar();
-        if (GameController.getInstance().isPaused() && !levelUpPopupShown && !pauseMenuButton) {
+        if (GameController.getInstance().isPaused() && !levelUpPopupShown && !pauseMenuButton && !winOrLoseButton) {
             showLevelUpPopup();
             levelUpPopupShown = true;
         }
@@ -204,12 +216,12 @@ public class GameView implements Screen, InputProcessor {
             CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 20
         );
         font.draw(Main.getInstance().getBatch(),
-            String.format("Kill : %d",App.getInstance().getCurrentPlayer().getCurrentKills()),
+            String.format("Kill : %d",player.getCurrentKills()),
             CameraController.getCameraController().getCamera().position.x - CameraController.getCameraController().getCamera().viewportWidth / 2 + 25,
             CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 60
         );
         font.draw(Main.getInstance().getBatch(),
-            String.format("Ammo : %d",App.getInstance().getCurrentPlayer().getWeapon().getAmmo()),
+            String.format("Ammo : %d",player.getWeapon().getAmmo()),
             CameraController.getCameraController().getCamera().position.x - CameraController.getCameraController().getCamera().viewportWidth / 2 + 25,
             CameraController.getCameraController().getCamera().position.y + CameraController.getCameraController().getCamera().viewportHeight / 2 - 100
         );
@@ -260,7 +272,7 @@ public class GameView implements Screen, InputProcessor {
 
     private void showLevelUpPopup() {
         Skin skin = GameAssetManager.getInstance().getSkin();
-
+        pauseMenuButton = true;
         Table table = new Table();
         table.setFillParent(true);
         table.center(); // Center the entire table on screen
@@ -314,9 +326,72 @@ public class GameView implements Screen, InputProcessor {
 
     }
 
+    private void showPausePopup() {
+        if(pauseMenuButton)
+            return;
+        Skin skin = GameAssetManager.getInstance().getSkin();
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center(); // Center the table
+
+        // Title
+        Label title = new Label("Game Paused", skin, "title");
+        table.add(title).colspan(2).padBottom(30).row();
+
+        // Abilities acquired section
+        Label abilitiesTitle = new Label("Abilities Acquired:", skin);
+        table.add(abilitiesTitle).colspan(2).padBottom(10).row();
+
+        // List abilities
+        for (AbilityType ability : player.getAbilities()) {
+            Label abilityLabel = new Label("- " + ability.getName(), skin);
+            table.add(abilityLabel).colspan(2).left().padBottom(5).row();
+        }
+
+        table.row().padTop(40);
+
+        // Resume and Leave buttons
+        TextButton resumeButton = new TextButton("Resume", skin);
+        TextButton leaveButton = new TextButton("Leave Game", skin);
+
+        float buttonWidth = 400;
+        float buttonHeight = 120;
+
+        table.add(resumeButton).width(buttonWidth).height(buttonHeight).pad(20);
+        table.add(leaveButton).width(buttonWidth).height(buttonHeight).pad(20);
+
+        // Button listeners
+        resumeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                closePausePopup(table);
+            }
+        });
+
+        leaveButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                //TODO: save currentGame
+                Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+
+            }
+        });
+
+        stage.addActor(table);
+    }
+
+    private void closePausePopup(Table popup) {
+        gameController.resumeGame();
+        pauseMenuButton = false;
+        winOrLoseButton = false;
+        popup.remove();
+    }
+
     private void closeLevelUpPopup(Actor popupTable) {
         popupTable.remove();
         levelUpPopupShown = false;
+        pauseMenuButton = false;
         gameController.resumeGame();
     }
 
@@ -371,27 +446,182 @@ public class GameView implements Screen, InputProcessor {
     }
 
     public void checkAbility(AbilityType ability) {
+        player.addAbility(ability);
         switch (ability){
             case Speedy : {
-                App.getInstance().getCurrentPlayer().doubleSpeedFor10Seconds();
+                player.doubleSpeedFor10Seconds();
                 break;
             }
             case Vitality:{
-                App.getInstance().getCurrentPlayer().addMaxHealth(100);
+                player.addMaxHealth(100);
                 break;
             }
             case Amocrease:{
-                App.getInstance().getCurrentPlayer().getWeapon().addMaxAmmo();
+                player.getWeapon().addMaxAmmo();
                 break;
             }
             case Procrease:{
-                App.getInstance().getCurrentPlayer().getWeapon().addProjectile();
+                player.getWeapon().addProjectile();
                 break;
             }
             case Damager:{
-                App.getInstance().getCurrentPlayer().increaseDamageFor10Seconds();
+                player.increaseDamageFor10Seconds();
                 break;
             }
         }
+    }
+
+    private void drawHealth() {
+        float maxHealth = player.getMaxHealth();
+        float currentHealth = player.getPlayerHealth();
+        int hearts = (int) (maxHealth / 100);
+        if(currentHealth % 100 != 0){
+            hearts++;
+        }
+        float startX = CameraController.getCameraController().getCamera().position.x -
+            CameraController.getCameraController().getCamera().viewportWidth / 2 + 20;
+        float startY = CameraController.getCameraController().getCamera().position.y +
+            CameraController.getCameraController().getCamera().viewportHeight / 2 - 180;
+
+        for (int i = 0; i < hearts; i++) {
+            boolean isFull = currentHealth >= (i + 1) * 20;
+            Main.getInstance().getBatch().draw(
+                isFull ? GameAssetManager.getInstance().getHeartTexture0() : GameAssetManager.getInstance().getHeartTexture3(),
+                startX + i * 40,
+                startY,
+                32, 32
+            );
+        }
+    }
+
+    private void showWin() {
+        gameController.pauseGame();
+        winOrLoseButton = true;
+        pauseMenuButton = true;
+        Skin skin = GameAssetManager.getInstance().getSkin();
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center();
+
+        User user = App.getInstance().getCurrentUser(); // Adjust this if needed
+
+        // Title
+        Label title = new Label("You WON", skin, "title");
+        table.add(title).colspan(2).padBottom(30).row();
+
+        // User and Player Info
+        Label userInfo = new Label("User: " + user.getName(), skin);
+        Label healthInfo = new Label("Health: " + player.getPlayerHealth() + " / " + player.getMaxHealth(), skin);
+        Label killInfo = new Label("Kills: " + player.getCurrentKills(), skin); // Replace with real method if different
+
+        table.add(userInfo).colspan(2).left().padBottom(10).row();
+        table.add(healthInfo).colspan(2).left().padBottom(5).row();
+        table.add(killInfo).colspan(2).left().padBottom(15).row();
+
+        // Abilities acquired section
+        Label abilitiesTitle = new Label("Abilities Acquired:", skin);
+        table.add(abilitiesTitle).colspan(2).padBottom(10).row();
+
+        for (AbilityType ability : player.getAbilities()) {
+            Label abilityLabel = new Label("- " + ability.getName(), skin);
+            table.add(abilityLabel).colspan(2).left().padBottom(5).row();
+        }
+
+        table.row().padTop(40);
+
+        // Resume and Leave buttons
+        TextButton resumeButton = new TextButton("Resume", skin);
+        TextButton leaveButton = new TextButton("Leave Game", skin);
+
+        float buttonWidth = 400;
+        float buttonHeight = 120;
+
+        table.add(resumeButton).width(buttonWidth).height(buttonHeight).pad(20);
+        table.add(leaveButton).width(buttonWidth).height(buttonHeight).pad(20);
+
+        // Button listeners
+        resumeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                closePausePopup(table);
+            }
+        });
+
+        leaveButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // TODO: save currentGame
+                Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
+
+        stage.addActor(table);
+    }
+
+    private void showLose() {
+        gameController.pauseGame();
+        winOrLoseButton = true;
+        pauseMenuButton = true;
+        Skin skin = GameAssetManager.getInstance().getSkin();
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center();
+
+        User user = App.getInstance().getCurrentUser(); // Adjust this if needed
+
+        // Title
+        Label title = new Label("You LOST", skin, "title");
+        table.add(title).colspan(2).padBottom(30).row();
+
+        // User and Player Info
+        Label userInfo = new Label("User: " + user.getName(), skin);
+        Label healthInfo = new Label("Health: " + player.getPlayerHealth() + " / " + player.getMaxHealth(), skin);
+        Label killInfo = new Label("Kills: " + player.getCurrentKills(), skin);
+        Label timeinfo = new Label("Alive Time: " + gameController.getLastTime() + "s", skin);
+        table.add(userInfo).colspan(2).left().padBottom(10).row();
+        table.add(healthInfo).colspan(2).left().padBottom(5).row();
+        table.add(killInfo).colspan(2).left().padBottom(15).row();
+        table.add(timeinfo).colspan(2).left().padBottom(15).row();
+
+        // Abilities acquired section
+        Label abilitiesTitle = new Label("Abilities Acquired:", skin);
+        table.add(abilitiesTitle).colspan(2).padBottom(10).row();
+
+        for (AbilityType ability : player.getAbilities()) {
+            Label abilityLabel = new Label("- " + ability.getName(), skin);
+            table.add(abilityLabel).colspan(2).left().padBottom(5).row();
+        }
+
+        table.row().padTop(40);
+
+        // Resume and Leave buttons
+        TextButton resumeButton = new TextButton("Resume", skin);
+        TextButton leaveButton = new TextButton("Leave Game", skin);
+
+        float buttonWidth = 400;
+        float buttonHeight = 120;
+
+        table.add(resumeButton).width(buttonWidth).height(buttonHeight).pad(20);
+        table.add(leaveButton).width(buttonWidth).height(buttonHeight).pad(20);
+
+        // Button listeners
+        resumeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                closePausePopup(table);
+            }
+        });
+
+        leaveButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // TODO: save currentGame
+                Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
+
+        stage.addActor(table);
     }
 }

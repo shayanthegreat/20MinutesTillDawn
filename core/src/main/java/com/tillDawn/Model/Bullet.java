@@ -21,7 +21,7 @@ public class Bullet {
         this.direction = direction.nor(); // normalized direction
         this.sprite.setPosition(x, y);
         this.sprite.setSize(10, 10);
-        this.rect = new CollisionRect(x, y, 10, 10);
+        this.rect = new CollisionRect(x, y, 15, 15);
     }
 
     public void update() {
@@ -32,8 +32,10 @@ public class Bullet {
         position.add(dx, dy);
         rect.setX(position.x);
         rect.setY(position.y);
-        // Update the collision rectangle to match the new sprite position
         rect.move(sprite.getX(), sprite.getY());
+        if (rect.collidesWith(App.getInstance().getCurrentPlayer().getRect())) {
+            App.getInstance().getCurrentPlayer().updateHealth(-damage);
+        }
     }
 
     public void monsterHit(Monster monster) {

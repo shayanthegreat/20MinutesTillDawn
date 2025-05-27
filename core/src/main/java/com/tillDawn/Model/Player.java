@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+import java.util.ArrayList;
+
 public class Player {
 
     private Texture playerTexture = new Texture(Gdx.files.internal("player1-.png"));
@@ -26,6 +28,7 @@ public class Player {
     private boolean damageBoosted = false;
     private float damageBoostedLeft = 0;
     private float originalSpeed;
+    private ArrayList<AbilityType> abilities = new ArrayList<>();
     private User user = null;
     public Player(CharacterType characterType, Weapon weapon){
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
@@ -48,6 +51,7 @@ public class Player {
             playerHealth = maxHealth;
         }
         if(playerHealth <= 0){
+            playerHealth = 0;
             isDead = true;
         }
     }
@@ -212,5 +216,23 @@ public class Player {
 
     public boolean isDamageBoosted() {
         return damageBoosted;
+    }
+
+    public void addAbility(AbilityType abilityType){
+        if(!abilities.contains(abilityType)){
+            abilities.add(abilityType);
+        }
+    }
+
+    public ArrayList<AbilityType> getAbilities() {
+        return abilities;
+    }
+
+    public float getMaxHealth() {
+        return maxHealth;
+    }
+
+    public boolean isDead() {
+        return isDead;
     }
 }

@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.tillDawn.Controller.*;
 import com.tillDawn.Main;
+import com.tillDawn.Model.App;
 import com.tillDawn.Model.GameAssetManager;
 
 public class MainView implements Screen {
@@ -28,6 +29,7 @@ public class MainView implements Screen {
     private final TextButton preGameButton;
     private final TextButton scoreBoard;
     private final Table table;
+    private final TextButton exitButton;
 
     private final MainController controller;
 
@@ -46,6 +48,7 @@ public class MainView implements Screen {
         this.profileButton = new TextButton("Profile Menu", skin);
         this.preGameButton = new TextButton("Pre Game", skin);
         this.scoreBoard = new TextButton("ScoreBoard Menu", skin);
+        this.exitButton = new TextButton("Exit", skin);
 
         this.table = new Table();
     }
@@ -85,7 +88,9 @@ public class MainView implements Screen {
         table.add(profileButton).pad(10).expandX().fillX();
         table.add(preGameButton).pad(10).expandX().fillX();
         table.add(scoreBoard).pad(10).expandX().fillX();
-
+        table.row();
+        applyAnimatedHoverEffect(exitButton);
+        table.add(exitButton).pad(10).expandX().fillX().colspan(3);
         stage.addActor(table);
 
         profileButton.addListener(new ClickListener() {
@@ -117,6 +122,12 @@ public class MainView implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Main.getInstance().setScreen(new LoginMenuView(new LoginMenuController(), GameAssetManager.getInstance().getSkin()));
+            }
+        });
+        exitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                App.getInstance().AppCloser();
             }
         });
     }

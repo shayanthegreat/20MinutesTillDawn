@@ -11,13 +11,15 @@ public class User {
     private String avatarPath;
     private int xp;
     private int level;
+
+    public User() {}
     public User(String name, String password, String question, String answer) {
         this.name = name;
         this.password = password;
         this.question = question;
         this.answer = answer;
         this.avatarPath = "avatar/Avatar1.png";
-        this.xp = 18;
+        this.xp = 0;
         this.level = 1;
     }
 

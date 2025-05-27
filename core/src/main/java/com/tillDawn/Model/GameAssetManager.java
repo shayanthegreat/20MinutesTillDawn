@@ -24,6 +24,12 @@ public class GameAssetManager {
     Texture bulletTexture2 = new Texture(Gdx.files.internal(bullet2));
     Texture treeTexture = new Texture(Gdx.files.internal(tree));
 
+    Texture heartTexture0 = new Texture(Gdx.files.internal("HeartAnimation/HeartAnimation_0.png"));
+    Texture heartTexture1= new Texture(Gdx.files.internal("HeartAnimation/HeartAnimation_1.png"));
+    Texture heartTexture2 = new Texture(Gdx.files.internal("HeartAnimation/HeartAnimation_2.png"));
+    Texture heartTexture3 = new Texture(Gdx.files.internal("HeartAnimation/HeartAnimation_3.png"));
+
+
     public Skin getSkin() {
         return skin;
     }
@@ -86,5 +92,21 @@ public class GameAssetManager {
 
     public Texture getTreeTexture() {
         return treeTexture;
+    }
+
+    public Texture getHeartTexture0() {
+        return heartTexture0;
+    }
+
+    public Texture getHeartTexture1() {
+        return heartTexture1;
+    }
+
+    public Texture getHeartTexture2() {
+        return heartTexture2;
+    }
+
+    public Texture getHeartTexture3() {
+        return heartTexture3;
     }
 }

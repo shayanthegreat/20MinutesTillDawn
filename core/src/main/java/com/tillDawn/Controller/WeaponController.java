@@ -58,7 +58,7 @@ public class WeaponController {
         Vector2 baseDirection = new Vector2(worldMouse.x - startX, worldMouse.y - startY).nor();
 
         int ammoToUse = Math.min(weapon.getProjectile(), weapon.getAmmo());
-        if (ammoToUse % 2 == 0) {
+        if (ammoToUse % 2 == 1) {
             Bullet newBullet = new Bullet(weapon.getAmmoDamage(), startX, startY, baseDirection);
             newBullet.getSprite().setOriginCenter();
             newBullet.getSprite().setRotation(baseDirection.angleDeg());
@@ -133,9 +133,6 @@ public class WeaponController {
         Main.getInstance().getBatch().begin();
         for (Bullet bullet : enemyBullets) {
             bullet.update();
-            if (bullet.getRect().collidesWith(App.getInstance().getCurrentPlayer().getRect())) {
-                App.getInstance().getCurrentPlayer().updateHealth(-1);
-            }
             bullet.draw(Main.getInstance().getBatch());
         }
     }

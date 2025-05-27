@@ -3,6 +3,7 @@ package com.tillDawn.Controller;
 import com.tillDawn.Model.App;
 import com.tillDawn.Model.Result;
 import com.tillDawn.Model.User;
+import com.tillDawn.Model.UserSaver;
 
 import java.util.ArrayList;
 
@@ -33,7 +34,8 @@ public class Controller {
         if(!checkPassword(password)) {
             return new Result("Please enter a valid password!", false);
         }
-        users.add(new User(username, password, question, answer));
+        User newUser = new User(username, password, question, answer);
+        users.add(newUser);
         return new Result("Successfully registered user!", true);
     }
 

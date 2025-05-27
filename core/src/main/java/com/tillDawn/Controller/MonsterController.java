@@ -36,7 +36,7 @@ public class MonsterController {
         spawnTimer2 += deltaTime;
         float j = gameTime;
         if (spawnTimer >= 3f) {
-            int monstersToSpawn = (int) j / (1);
+            int monstersToSpawn = (int) j / (30);
 
             for (int i = 0; i < monstersToSpawn; i++) {
                 spawnMonster(MonsterType.Tentacle);
@@ -58,7 +58,6 @@ public class MonsterController {
         }
         Player player = App.getInstance().getCurrentPlayer();
         CollisionRect playerRect = player.getRect();
-        // Update all monsters
         for (Monster monster : monsters) {
             CollisionRect monsterRect = monster.getRect();
             if (monster.getMonsterType() == MonsterType.Shub) {
@@ -101,9 +100,9 @@ public class MonsterController {
     private void shootBulletAtPlayer(Monster monster, Player player) {
         float startX = monster.getPosX();
         float startY = monster.getPosY();
-        Vector2 direction = new Vector2(player.getPosX() - startX, player.getPosY() - startY).nor();
+        Vector2 direction = new Vector2(Gdx.graphics.getWidth()/2f - startX, Gdx.graphics.getHeight()/2f - startY).nor();
 
-        Bullet bullet = new Bullet(1, startX, startY, direction); // You can adjust damage
+        Bullet bullet = new Bullet(5, startX, startY, direction);
         weaponController.addEnemyBullet(bullet);
     }
 }
