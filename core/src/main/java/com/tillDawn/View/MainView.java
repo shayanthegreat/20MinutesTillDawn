@@ -92,7 +92,12 @@ public class MainView implements Screen {
         applyAnimatedHoverEffect(exitButton);
         table.add(exitButton).pad(10).expandX().fillX().colspan(3);
         stage.addActor(table);
-
+        scoreBoard.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Main.getInstance().setScreen(new ScoreBoardView());
+            }
+        });
         profileButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

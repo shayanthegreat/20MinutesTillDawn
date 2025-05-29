@@ -412,7 +412,7 @@ public class GameView implements Screen, InputProcessor {
         float top = camY + viewHeight / 2 + 500;
 
         for (Monster monster : monsters) {
-            if (!monster.isDead()) {
+            if (!monster.isDead() || (!monster.isFinishedDeathAnimation() && monster.isDead())) {
                 float x = monster.getPosX();
                 float y = monster.getPosY();
                 float width = monster.getMonsterType().getWidth();
@@ -492,7 +492,6 @@ public class GameView implements Screen, InputProcessor {
                 32, 32
             );
         }
-        System.out.println(player.getPlayerHealth());
     }
 
     private void showWin() {
@@ -515,11 +514,15 @@ public class GameView implements Screen, InputProcessor {
         Label userInfo = new Label("User: " + user.getName(), skin);
         Label healthInfo = new Label("Health: " + player.getPlayerHealth() + " / " + player.getMaxHealth(), skin);
         Label killInfo = new Label("Kills: " + player.getCurrentKills(), skin); // Replace with real method if different
+        Label scoreInfo = new Label("Score: " + App.getInstance().getGameTime() * 60 * player.getCurrentKills(), skin);
 
         table.add(userInfo).colspan(2).left().padBottom(10).row();
         table.add(healthInfo).colspan(2).left().padBottom(5).row();
         table.add(killInfo).colspan(2).left().padBottom(15).row();
-
+        table.add(scoreInfo).colspan(2).left().padBottom(15).row();
+        App.getInstance().getCurrentUser().setScore(App.getInstance().getCurrentUser().getScore() + App.getInstance().getGameTime() * 60 * player.getCurrentKills());
+        App.getInstance().getCurrentUser().setAliveTime(App.getInstance().getCurrentUser().getAliveTime() + App.getInstance().getGameTime() * 60);
+        App.getInstance().getCurrentUser().setKillCount(App.getInstance().getCurrentUser().getKillCount() + player.getCurrentKills());
         // Abilities acquired section
         Label abilitiesTitle = new Label("Abilities Acquired:", skin);
         table.add(abilitiesTitle).colspan(2).padBottom(10).row();
@@ -571,10 +574,12 @@ public class GameView implements Screen, InputProcessor {
         Label healthInfo = new Label("Health: " + player.getPlayerHealth() + " / " + player.getMaxHealth(), skin);
         Label killInfo = new Label("Kills: " + player.getCurrentKills(), skin);
         Label timeinfo = new Label("Alive Time: " + gameController.getLastTime() + "s", skin);
+        Label scoreInfo = new Label("Score: " + App.getInstance().getGameTime() * 60 * player.getCurrentKills(), skin);
         table.add(userInfo).colspan(2).left().padBottom(10).row();
         table.add(healthInfo).colspan(2).left().padBottom(5).row();
         table.add(killInfo).colspan(2).left().padBottom(15).row();
         table.add(timeinfo).colspan(2).left().padBottom(15).row();
+        table.add(scoreInfo).colspan(2).left().padBottom(15).row();
 
         // Abilities acquired section
         Label abilitiesTitle = new Label("Abilities Acquired:", skin);

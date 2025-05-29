@@ -80,7 +80,7 @@ public class MonsterController {
 
         ArrayList<Monster> deadMonsters = new ArrayList<>();
         for(Monster monster : App.getInstance().getMonsters()) {
-            if(monster.isDead()) {
+            if(monster.isDead() && monster.isFinishedDeathAnimation()) {
                 deadMonsters.add(monster);
             }
         }

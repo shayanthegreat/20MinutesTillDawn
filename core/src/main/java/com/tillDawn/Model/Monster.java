@@ -3,6 +3,7 @@ package com.tillDawn.Model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,13 +22,25 @@ public class Monster {
     private float shootTimer = 0f;
     private MonsterType monsterType;
 
-    // Transient runtime-only fields (not serialized)
+    // Animations
     @JsonIgnore
     private Animation<TextureRegion> animation;
     @JsonIgnore
     private Animation<TextureRegion> normalAnimation;
     @JsonIgnore
     private Animation<TextureRegion> dashAnimation;
+
+    // Death animation fields
+    @JsonIgnore
+    private Animation<TextureRegion> deathAnimation;
+    @JsonIgnore
+    private float deathAnimationTime = 0f;
+    @JsonIgnore
+    private boolean playingDeathAnimation = false;
+    @JsonIgnore
+    private boolean finishedDeathAnimation = false;
+    @JsonIgnore
+    private float deathAnimationDuration = 1f; // Adjust as needed
 
     private float dashCooldown = 5f;
     private float dashTimer = 0f;
@@ -40,6 +53,9 @@ public class Monster {
     // Serializable asset paths for Shub animations
     private String[] normalAnimationFrames;
     private String[] dashAnimationFrames;
+
+    // Add death animation frames (example)
+    private String[] deathAnimationFrames;
 
     public Monster() {}
 
@@ -58,6 +74,7 @@ public class Monster {
             ensureShubAnimationFrames();
         }
 
+        ensureDeathAnimationFrames();
         loadAssets();
     }
 
@@ -81,7 +98,22 @@ public class Monster {
         }
     }
 
+    private void ensureDeathAnimationFrames() {
+        if (deathAnimationFrames == null) {
+            // You must provide death animation frames here:
+            deathAnimationFrames = new String[] {
+                "damage/FireballExplosion_0.png",
+                "damage/FireballExplosion_1.png",
+                "damage/FireballExplosion_2.png",
+                "damage/FireballExplosion_3.png",
+                "damage/FireballExplosion_4.png",
+                "damage/FireballExplosion_5.png",
+            };
+        }
+    }
+
     public void loadAssets() {
+        ensureDeathAnimationFrames();
         if (monsterType != null) {
             animation = monsterType.getAnimation();
 
@@ -90,16 +122,9 @@ public class Monster {
                 normalAnimation = createAnimation(normalAnimationFrames, 1f);
                 dashAnimation = createAnimation(dashAnimationFrames, 0.3f);
             }
-        }
-    }
 
-    public void knockback(Vector2 direction, float force) {
-        Vector2 knock = new Vector2(direction).nor().scl(force);
-        this.posX += knock.x;
-        this.posY += knock.y;
-
-        if (rect != null) {
-            rect.move(posX, posY);
+            // Load death animation
+            deathAnimation = createAnimation(deathAnimationFrames, deathAnimationDuration / deathAnimationFrames.length);
         }
     }
 
@@ -112,7 +137,29 @@ public class Monster {
         return new Animation<>(frameDuration, frames);
     }
 
+    public void knockback(Vector2 direction, float force) {
+        Vector2 knock = new Vector2(direction).nor().scl(force);
+        this.posX += knock.x;
+        this.posY += knock.y;
+
+        if (rect != null) {
+            rect.move(posX, posY);
+        }
+    }
+
     public void update(float deltaTime, float playerX, float playerY) {
+        // If playing death animation, advance it and stop other updates
+        if (playingDeathAnimation) {
+            deathAnimationTime += deltaTime;
+            if (deathAnimation.isAnimationFinished(deathAnimationTime)) {
+                playingDeathAnimation = false;
+                finishedDeathAnimation = true;
+            }
+            return;
+        }
+
+        if (dead || finishedDeathAnimation) return;
+
         if (monsterType == MonsterType.Shub) {
             dashTimer += deltaTime;
 
@@ -171,18 +218,28 @@ public class Monster {
 
     public void updateHealth(float x) {
         this.health -= x;
-        if (this.health <= 0) {
+        if (this.health <= 0 && !this.dead && !this.playingDeathAnimation) {
             if (monsterType == MonsterType.EyeBat) {
                 WorldController.getInstance().addEgg(new Egg("eyeBat/T_EyeBat_EM.png", posX, posY));
             } else if (monsterType == MonsterType.Tentacle) {
                 WorldController.getInstance().addEgg(new Egg("tentacle/BrainMonster_Em.png", posX, posY));
             }
-            dead = true;
+            this.playingDeathAnimation = true;
+            this.deathAnimationTime = 0f;
+            this.dead = true;
         }
     }
 
-    public void draw(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {
+    public void draw(SpriteBatch batch) {
         stateTime += Gdx.graphics.getDeltaTime();
+        if (playingDeathAnimation && deathAnimation != null) {
+            TextureRegion frame = deathAnimation.getKeyFrame(deathAnimationTime, false);
+            batch.draw(frame, posX, posY, monsterType.getWidth(), monsterType.getHeight());
+            return;
+        }
+
+        if (finishedDeathAnimation) return;
+
         TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
 
         if (monsterType == MonsterType.Shub) {
@@ -206,6 +263,10 @@ public class Monster {
 
     public boolean isDead() {
         return dead;
+    }
+
+    public boolean isFinishedDeathAnimation() {
+        return finishedDeathAnimation;
     }
 
     public CollisionRect getRect() {

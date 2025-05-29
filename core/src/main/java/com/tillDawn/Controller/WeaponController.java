@@ -94,6 +94,7 @@ public class WeaponController {
 
         sprite.draw(Main.getInstance().getBatch());
         ArrayList<Monster> monsters = App.getInstance().getMonsters();
+        ArrayList<Bullet> deadBullets = new ArrayList<>();
         for (Bullet bullet : App.getInstance().getBullets()) {
             bullet.update();
             CollisionRect bulletRect = bullet.getRect();
@@ -101,6 +102,7 @@ public class WeaponController {
                 CollisionRect monsterRect = monster.getRect();
                 if(bulletRect.collidesWith(monsterRect)){
                     bullet.monsterHit(monster);
+                    deadBullets.add(bullet);
                 }
             }
             bullet.draw(Main.getInstance().getBatch());

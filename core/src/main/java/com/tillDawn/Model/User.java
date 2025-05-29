@@ -12,6 +12,9 @@ public class User {
     private int xp;
     private int level;
     private GameDetails gameDetails;
+    private int score;
+    private int aliveTime;
+    private int killCount;
     public User() {}
     public User(String name, String password, String question, String answer) {
         this.name = name;
@@ -22,6 +25,9 @@ public class User {
         this.xp = 0;
         this.level = 1;
         this.gameDetails = null;
+        this.score = 0;
+        this.aliveTime = 0;
+        this.killCount = 0;
     }
 
     public String getName() {
@@ -94,5 +100,29 @@ public class User {
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getAliveTime() {
+        return aliveTime;
+    }
+
+    public void setAliveTime(int aliveTime) {
+        this.aliveTime = aliveTime;
+    }
+
+    public int getKillCount() {
+        return killCount;
+    }
+
+    public void setKillCount(int killCount) {
+        this.killCount = killCount;
     }
 }

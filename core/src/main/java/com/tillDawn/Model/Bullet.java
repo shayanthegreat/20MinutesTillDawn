@@ -21,7 +21,7 @@ public class Bullet {
     private CollisionRect rect;
     private Vector2 position;
     private Vector2 direction;
-    private float speed = 1000f;
+    private float speed = 2000f;
 
     public Bullet() {
         this.position = new Vector2();

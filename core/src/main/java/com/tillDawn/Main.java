@@ -51,6 +51,7 @@ public class Main extends Game {
         //setScreen(SettingView.getInstance());
         //setScreen(new PreGameView(new PreGameController(), GameAssetManager.getInstance().getSkin()));
         //setScreen(new KeyView());
+
     }
 
     @Override

@@ -101,11 +101,11 @@ public class LoginMenuView implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 String username = usernameField.getText();
                 String password = passwordField.getText();
-                Result result = new Result("ad",true);
+                Result result = controller.loginUser(username, password);
                 if (!result.isSuccess()) {
                     errorLabel.setText(result.getMessage());
                 } else {
-                    //controller.switchToMainMenu(); // Or appropriate action
+                    Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
                 }
             }
         });
