@@ -44,7 +44,6 @@ public class GameView implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-
         if(gameController.isPaused())
             return false;
         if(KeyBindings.ACTION_CLICK == 0){
@@ -148,7 +147,6 @@ public class GameView implements Screen, InputProcessor {
 
         levelLabel = new Label("Level: 1", skin);
 
-        // Top UI table (XP bar & level label)
         Table topTable = new Table();
         topTable.setFillParent(true);
         topTable.top();
@@ -183,16 +181,21 @@ public class GameView implements Screen, InputProcessor {
         Main.getInstance().getBatch().end();
         gameController.updateGame();
         Main.getInstance().getBatch().begin();
-        drawTime();
+
         drawMonster();
         drawTree();
         drawEgg();
-        drawHealth();
-        System.out.println(player.getPlayerHealth());
+
+        Main.getInstance().getBatch().end();
         if (gameController.getWorldController().getFence().isActive()) {
             drawFence();
         }
-        if(gameController.getLastTime() >= App.getInstance().getGameTime() * 30 && !winOrLoseButton){
+
+        Main.getInstance().getBatch().begin();
+        drawTime();
+
+        drawHealth();
+        if(gameController.getLastTime() >= App.getInstance().getGameTime() * 60 && !winOrLoseButton){
             showWin();
         }
         if(player.isDead() && !winOrLoseButton){
@@ -372,8 +375,7 @@ public class GameView implements Screen, InputProcessor {
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                //TODO: save currentGame
-                Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+                saveGame();
 
             }
         });
@@ -454,6 +456,7 @@ public class GameView implements Screen, InputProcessor {
             }
             case Vitality:{
                 player.addMaxHealth(100);
+                player.updateHealth(+100f / Gdx.graphics.getDeltaTime());
                 break;
             }
             case Amocrease:{
@@ -475,16 +478,13 @@ public class GameView implements Screen, InputProcessor {
         float maxHealth = player.getMaxHealth();
         float currentHealth = player.getPlayerHealth();
         int hearts = (int) (maxHealth / 100);
-        if(currentHealth % 100 != 0){
-            hearts++;
-        }
         float startX = CameraController.getCameraController().getCamera().position.x -
             CameraController.getCameraController().getCamera().viewportWidth / 2 + 20;
         float startY = CameraController.getCameraController().getCamera().position.y +
             CameraController.getCameraController().getCamera().viewportHeight / 2 - 180;
 
         for (int i = 0; i < hearts; i++) {
-            boolean isFull = currentHealth >= (i + 1) * 20;
+            boolean isFull = currentHealth > (i) * 100;
             Main.getInstance().getBatch().draw(
                 isFull ? GameAssetManager.getInstance().getHeartTexture0() : GameAssetManager.getInstance().getHeartTexture3(),
                 startX + i * 40,
@@ -492,6 +492,7 @@ public class GameView implements Screen, InputProcessor {
                 32, 32
             );
         }
+        System.out.println(player.getPlayerHealth());
     }
 
     private void showWin() {
@@ -529,29 +530,19 @@ public class GameView implements Screen, InputProcessor {
         }
 
         table.row().padTop(40);
-
-        // Resume and Leave buttons
-        TextButton resumeButton = new TextButton("Resume", skin);
         TextButton leaveButton = new TextButton("Leave Game", skin);
 
         float buttonWidth = 400;
         float buttonHeight = 120;
 
-        table.add(resumeButton).width(buttonWidth).height(buttonHeight).pad(20);
         table.add(leaveButton).width(buttonWidth).height(buttonHeight).pad(20);
 
         // Button listeners
-        resumeButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                closePausePopup(table);
-            }
-        });
 
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // TODO: save currentGame
+                App.getInstance().getCurrentUser().setGameDetails(null);
                 Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
             }
         });
@@ -597,31 +588,26 @@ public class GameView implements Screen, InputProcessor {
         table.row().padTop(40);
 
         // Resume and Leave buttons
-        TextButton resumeButton = new TextButton("Resume", skin);
         TextButton leaveButton = new TextButton("Leave Game", skin);
 
         float buttonWidth = 400;
         float buttonHeight = 120;
 
-        table.add(resumeButton).width(buttonWidth).height(buttonHeight).pad(20);
         table.add(leaveButton).width(buttonWidth).height(buttonHeight).pad(20);
-
-        // Button listeners
-        resumeButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                closePausePopup(table);
-            }
-        });
 
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // TODO: save currentGame
+                App.getInstance().getCurrentUser().setGameDetails(null);
                 Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
             }
         });
-
         stage.addActor(table);
+    }
+
+    void saveGame(){
+        App.getInstance().getCurrentUser().setGameDetails(App.getInstance().getCurrentGame());
+        App.getInstance().saveUsersToJson("users.json");
+        Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
     }
 }

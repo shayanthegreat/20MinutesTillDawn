@@ -6,25 +6,38 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Tree{
-    Sprite sprite;
-    float worldX;
-    float worldY;
-    private CollisionRect rect;
+public class Tree {
+    public float worldX;
+    public float worldY;
+
+    private transient Sprite sprite;
+    private transient CollisionRect rect;
+    private transient Animation<TextureRegion> animation;
     private float stateTime = 0f;
-    private Animation<TextureRegion> animation;
+
+    public Tree() {
+        // Required for JSON deserialization
+    }
+
     public Tree(Sprite sprite, float x, float y) {
-        this.sprite = sprite;
         this.worldX = x;
         this.worldY = y;
-        this.rect = new CollisionRect(x, y, 140, 182);
-        this.animation = new Animation(1f,
+        this.sprite = sprite;
+        initialize();
+    }
+
+    public void initialize() {
+        rect = new CollisionRect(worldX, worldY, 140, 182);
+        animation = new Animation<>(1f,
             new TextureRegion(new Texture(Gdx.files.internal("item/T_TreeMonster_0.png"))),
             new TextureRegion(new Texture(Gdx.files.internal("item/T_TreeMonster_1.png"))),
             new TextureRegion(new Texture(Gdx.files.internal("item/T_TreeMonster_2.png")))
-            );
-
+        );
+        sprite = new Sprite(animation.getKeyFrame(0f));
+        sprite.setPosition(worldX, worldY);
+        sprite.setSize(140, 182);
     }
 
     public void update(float delta) {
@@ -32,12 +45,9 @@ public class Tree{
     }
 
     public void draw(SpriteBatch batch) {
+        if (animation == null) return; // avoid null if not initialized
         TextureRegion frame = animation.getKeyFrame(stateTime, true);
-        batch.draw(frame, worldX, worldY, 140, 182); // adjust size if needed
-    }
-
-    public Sprite getSprite() {
-        return sprite;
+        batch.draw(frame, worldX, worldY, 140, 182);
     }
 
     public float getWorldX() {
@@ -48,11 +58,13 @@ public class Tree{
         return worldY;
     }
 
-    public CollisionRect getRect() {
-        return rect;
-    }
+    @JsonIgnore
+    public Sprite getSprite() { return sprite; }
 
+    @JsonIgnore
+    public CollisionRect getRect() { return rect; }
     public void updateRect() {
-        rect.move(worldX, worldY); // update based on world coordinates
+        if (rect != null)
+            rect.move(worldX, worldY);
     }
 }

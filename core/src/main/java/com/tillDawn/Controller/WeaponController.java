@@ -18,8 +18,7 @@ import java.util.ArrayList;
 public class WeaponController {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-    private ArrayList<Bullet> bullets = new ArrayList<>();
-    private ArrayList<Bullet> enemyBullets = new ArrayList<>();
+
     private float shootCooldown = 0f; // in seconds
     public void handleWeaponRotation(int x, int y) {
         Weapon weapon = App.getInstance().getCurrentPlayer().getWeapon();
@@ -62,7 +61,7 @@ public class WeaponController {
             Bullet newBullet = new Bullet(weapon.getAmmoDamage(), startX, startY, baseDirection);
             newBullet.getSprite().setOriginCenter();
             newBullet.getSprite().setRotation(baseDirection.angleDeg());
-            bullets.add(newBullet);
+            App.getInstance().getBullets().add(newBullet);
             weapon.setAmmo(weapon.getAmmo() - 1);
             ammoToUse--;
         }
@@ -73,7 +72,7 @@ public class WeaponController {
             Bullet pellet = new Bullet(weapon.getAmmoDamage(), startX, startY, spreadDir);
             pellet.getSprite().setOriginCenter();
             pellet.getSprite().setRotation(spreadDir.angleDeg());
-            bullets.add(pellet);
+            App.getInstance().getBullets().add(pellet);
         }
 
         weapon.setAmmo(weapon.getAmmo() - ammoToUse);
@@ -95,7 +94,7 @@ public class WeaponController {
 
         sprite.draw(Main.getInstance().getBatch());
         ArrayList<Monster> monsters = App.getInstance().getMonsters();
-        for (Bullet bullet : bullets) {
+        for (Bullet bullet : App.getInstance().getBullets()) {
             bullet.update();
             CollisionRect bulletRect = bullet.getRect();
             for (Monster monster : monsters) {
@@ -131,7 +130,7 @@ public class WeaponController {
             shapeRenderer.end();
         }
         Main.getInstance().getBatch().begin();
-        for (Bullet bullet : enemyBullets) {
+        for (Bullet bullet : App.getInstance().getEnemyBullets()) {
             bullet.update();
             bullet.draw(Main.getInstance().getBatch());
         }
@@ -144,7 +143,6 @@ public class WeaponController {
             weapon.reload();
             return;
         }
-
         if (weapon.getAmmo() <= 0 && App.getInstance().isAutoReload()) {
             weapon.reload();
             return;
@@ -160,7 +158,7 @@ public class WeaponController {
     }
 
     public void addEnemyBullet(Bullet bullet) {
-        enemyBullets.add(bullet);
+        App.getInstance().getEnemyBullets().add(bullet);
     }
 
 

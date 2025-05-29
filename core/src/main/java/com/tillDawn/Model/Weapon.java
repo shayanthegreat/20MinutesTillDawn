@@ -3,11 +3,18 @@ package com.tillDawn.Model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class Weapon {
-    private final String name;
-    private final Texture texture;
-    private final Sprite sprite;
+    private String name;
+    @JsonIgnore
+    private Texture texture;
+    @JsonIgnore
+    private Sprite sprite;
+
+    private String textureFilePath;     // store texture file path for reload
+
     private int ammo;
     private int maxAmmo;
     private boolean isReloading;
@@ -15,46 +22,62 @@ public class Weapon {
     private float reloadTimer;
     private int ammoDamage;
     private int projectile;
+
+    // No-arg constructor needed for serialization
+    public Weapon() {}
+
     public Weapon(String name) {
+        this.name = name;
+        initWeaponByName(name);
+    }
+
+    private void initWeaponByName(String name) {
         switch (name) {
             case "Revolver":
-                this.name = "Revolver";
-                texture = new Texture(Gdx.files.internal("gun/revolver.png"));
+                textureFilePath = "gun/revolver.png";
                 maxAmmo = 6;
                 reloadTime = 1;
                 ammoDamage = 20;
                 projectile = 1;
                 break;
-            case "Smg":{
-                this.name = "Smg";
-                texture = new Texture(Gdx.files.internal("gun/smg.png"));
+            case "Smg":
+                textureFilePath = "gun/smg.png";
                 maxAmmo = 24;
                 reloadTime = 2;
                 ammoDamage = 8;
                 projectile = 1;
                 break;
-            }
-            case "Shotgun":{
-                this.name = "Shotgun";
-                texture = new Texture(Gdx.files.internal("gun/shotgun.png"));
+            case "Shotgun":
+                textureFilePath = "gun/shotgun.png";
                 maxAmmo = 8;
                 reloadTime = 1;
                 ammoDamage = 10;
                 projectile = 4;
                 break;
-            }
-            default: {
-                this.name = "Unknown";
-                texture = new Texture(Gdx.files.internal("gun/default.png"));
-            }
+//            default:
+//                textureFilePath = "gun/default.png";
+//                maxAmmo = 0;
+//                reloadTime = 0;
+//                ammoDamage = 0;
+//                projectile = 0;
+//                break;
         }
-        this.ammo = maxAmmo;
-        this.isReloading = false;
-        this.reloadTimer = 0f;
-        sprite = new Sprite(texture);
-        sprite.setX((float) Gdx.graphics.getWidth() / 2);
-        sprite.setY((float) Gdx.graphics.getHeight() / 2);
-        sprite.setSize(50, 50);
+        ammo = maxAmmo;
+        isReloading = false;
+        reloadTimer = 0f;
+        loadTextureAndSprite();
+    }
+
+    // Call this after loading from JSON to restore texture and sprite
+    public void loadTextureAndSprite() {
+        if (textureFilePath != null && !textureFilePath.isEmpty()) {
+            texture = new Texture(Gdx.files.internal(textureFilePath));
+            sprite = new Sprite(texture);
+            sprite.setX((float) Gdx.graphics.getWidth() / 2);
+            sprite.setY((float) Gdx.graphics.getHeight() / 2);
+            sprite.setSize(50, 50);
+            reloadTimer = 0f;
+        }
     }
 
     public void reload() {
@@ -73,6 +96,7 @@ public class Weapon {
             }
         }
     }
+
     public Sprite getSprite() {
         return sprite;
     }
@@ -83,6 +107,10 @@ public class Weapon {
 
     public void setAmmo(int ammo) {
         this.ammo = ammo;
+    }
+
+    public void setReloading(boolean reloading) {
+        this.isReloading = reloading;
     }
 
     public boolean isReloading() {
@@ -112,7 +140,24 @@ public class Weapon {
     public int getAmmoDamage() {
         return ammoDamage;
     }
+
     public void addMaxAmmo() {
-        this.maxAmmo+=5;
+        this.maxAmmo += 5;
+    }
+
+    public String getTextureFilePath() {
+        return textureFilePath;
+    }
+
+    public void setTextureFilePath(String textureFilePath) {
+        this.textureFilePath = textureFilePath;
+    }
+
+    public int getMaxAmmo() {
+        return maxAmmo;
+    }
+
+    public void setMaxAmmo(int maxAmmo) {
+        this.maxAmmo = maxAmmo;
     }
 }

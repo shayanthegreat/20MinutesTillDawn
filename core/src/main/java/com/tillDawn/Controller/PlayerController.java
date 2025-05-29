@@ -75,7 +75,7 @@ public class PlayerController {
                 player.setPosX(oldX);
                 player.setPosY(oldY);
                 player.getRect().move(oldX, oldY);
-                player.updateHealth(-1);
+                player.updateHealth(-5);
                 return false;
             }
         }

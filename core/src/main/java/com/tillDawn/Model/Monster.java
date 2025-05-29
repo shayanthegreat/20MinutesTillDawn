@@ -3,11 +3,9 @@ package com.tillDawn.Model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tillDawn.Controller.WorldController;
 
 public class Monster {
@@ -22,7 +20,15 @@ public class Monster {
     private float stateTime = 0f;
     private float shootTimer = 0f;
     private MonsterType monsterType;
+
+    // Transient runtime-only fields (not serialized)
+    @JsonIgnore
     private Animation<TextureRegion> animation;
+    @JsonIgnore
+    private Animation<TextureRegion> normalAnimation;
+    @JsonIgnore
+    private Animation<TextureRegion> dashAnimation;
+
     private float dashCooldown = 5f;
     private float dashTimer = 0f;
     private boolean isDashing = false;
@@ -30,8 +36,13 @@ public class Monster {
     private float dashTimeLeft = 0f;
     private float dashDirX = 0;
     private float dashDirY = 0;
-    private Animation<TextureRegion> normalAnimation;
-    private Animation<TextureRegion> dashAnimation;
+
+    // Serializable asset paths for Shub animations
+    private String[] normalAnimationFrames;
+    private String[] dashAnimationFrames;
+
+    public Monster() {}
+
     public Monster(float posX, float posY, float time, MonsterType monsterType) {
         this.posX = posX;
         this.posY = posY;
@@ -41,23 +52,64 @@ public class Monster {
         this.speed = 15;
         this.damage = 10;
         this.monsterType = monsterType;
-        this.animation = monsterType.getAnimation();
-        if(monsterType == MonsterType.Shub){
+
+        if (monsterType == MonsterType.Shub) {
             this.speed = 20;
-            normalAnimation = new Animation<>(1f,
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_0.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_1.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_2.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_3.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_4.png"))));
-            dashAnimation = new Animation<>(0.3f,
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_5.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_6.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_7.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_8.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_9.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_10.png"))));
+            ensureShubAnimationFrames();
         }
+
+        loadAssets();
+    }
+
+    private void ensureShubAnimationFrames() {
+        if (normalAnimationFrames == null || dashAnimationFrames == null) {
+            normalAnimationFrames = new String[] {
+                "shub/T_ShubNiggurath_0.png",
+                "shub/T_ShubNiggurath_1.png",
+                "shub/T_ShubNiggurath_2.png",
+                "shub/T_ShubNiggurath_3.png",
+                "shub/T_ShubNiggurath_4.png"
+            };
+            dashAnimationFrames = new String[] {
+                "shub/T_ShubNiggurath_5.png",
+                "shub/T_ShubNiggurath_6.png",
+                "shub/T_ShubNiggurath_7.png",
+                "shub/T_ShubNiggurath_8.png",
+                "shub/T_ShubNiggurath_9.png",
+                "shub/T_ShubNiggurath_10.png"
+            };
+        }
+    }
+
+    public void loadAssets() {
+        if (monsterType != null) {
+            animation = monsterType.getAnimation();
+
+            if (monsterType == MonsterType.Shub) {
+                ensureShubAnimationFrames();
+                normalAnimation = createAnimation(normalAnimationFrames, 1f);
+                dashAnimation = createAnimation(dashAnimationFrames, 0.3f);
+            }
+        }
+    }
+
+    public void knockback(Vector2 direction, float force) {
+        Vector2 knock = new Vector2(direction).nor().scl(force);
+        this.posX += knock.x;
+        this.posY += knock.y;
+
+        if (rect != null) {
+            rect.move(posX, posY);
+        }
+    }
+
+    private Animation<TextureRegion> createAnimation(String[] framePaths, float frameDuration) {
+        TextureRegion[] frames = new TextureRegion[framePaths.length];
+        for (int i = 0; i < framePaths.length; i++) {
+            Texture tex = new Texture(Gdx.files.internal(framePaths[i]));
+            frames[i] = new TextureRegion(tex);
+        }
+        return new Animation<>(frameDuration, frames);
     }
 
     public void update(float deltaTime, float playerX, float playerY) {
@@ -69,7 +121,6 @@ public class Monster {
                 dashTimeLeft = dashDuration;
                 dashTimer = 0f;
 
-                // Calculate and fix dash direction once here
                 dashDirX = playerX - posX;
                 dashDirY = playerY - posY;
                 float length = (float) Math.sqrt(dashDirX * dashDirX + dashDirY * dashDirY);
@@ -82,7 +133,6 @@ public class Monster {
             if (isDashing) {
                 dashTimeLeft -= deltaTime;
 
-                // Move in fixed dash direction
                 posX += dashDirX * speed * 50f * deltaTime;
                 posY += dashDirY * speed * 50f * deltaTime;
 
@@ -94,11 +144,10 @@ public class Monster {
                     isDashing = false;
                 }
 
-                return;  // Skip normal movement while dashing
+                return;
             }
         }
 
-        // Default movement (not dashing)
         float dirX = playerX - posX;
         float dirY = playerY - posY;
         float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
@@ -123,35 +172,27 @@ public class Monster {
     public void updateHealth(float x) {
         this.health -= x;
         if (this.health <= 0) {
-            if(monsterType == MonsterType.EyeBat){
-                WorldController.getInstance().addEgg(new Egg(
-                    new Sprite(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_EM.png"))),
-                    posX, posY
-                ));
+            if (monsterType == MonsterType.EyeBat) {
+                WorldController.getInstance().addEgg(new Egg("eyeBat/T_EyeBat_EM.png", posX, posY));
+            } else if (monsterType == MonsterType.Tentacle) {
+                WorldController.getInstance().addEgg(new Egg("tentacle/BrainMonster_Em.png", posX, posY));
             }
-            else if(monsterType == MonsterType.Tentacle){
-                WorldController.getInstance().addEgg(new Egg(
-                    new Sprite(new Texture(Gdx.files.internal("tentacle/BrainMonster_Em.png"))),
-                    posX, posY
-                ));
-            }
-
             dead = true;
         }
     }
 
-    public void draw(SpriteBatch batch) {
+    public void draw(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {
         stateTime += Gdx.graphics.getDeltaTime();
         TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
 
-        if(monsterType == MonsterType.Shub){
-            if(isDashing){
+        if (monsterType == MonsterType.Shub) {
+            if (isDashing) {
                 currentFrame = dashAnimation.getKeyFrame(stateTime, true);
-            }
-            else{
+            } else {
                 currentFrame = normalAnimation.getKeyFrame(stateTime, true);
             }
         }
+
         if (monsterType == MonsterType.Shub && isDashing) {
             batch.setColor(1f, 0.3f, 0.3f, 1f); // Red tint
         }
@@ -162,6 +203,7 @@ public class Monster {
             batch.setColor(1f, 1f, 1f, 1f); // Reset color
         }
     }
+
     public boolean isDead() {
         return dead;
     }
@@ -177,6 +219,7 @@ public class Monster {
     public float getPosY() {
         return posY;
     }
+
     public void updateShootTimer(float delta) {
         shootTimer += delta;
     }
@@ -191,5 +234,41 @@ public class Monster {
 
     public MonsterType getMonsterType() {
         return monsterType;
+    }
+
+    public void setPosX(float posX) {
+        this.posX = posX;
+    }
+
+    public void setPosY(float posY) {
+        this.posY = posY;
+    }
+
+    public void setRect(CollisionRect rect) {
+        this.rect = rect;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
     }
 }

@@ -18,7 +18,6 @@ public class GameController {
     private PlayerController playerController;
     private WeaponController weaponController;
     private MonsterController monsterController;
-    private float elapsedTime = 0f;
     private float lastTime;
     private boolean paused = false;
 
@@ -61,9 +60,9 @@ public class GameController {
     public void updateGame(){
 
         if(view != null){
-            elapsedTime += Gdx.graphics.getDeltaTime();
+            App.getInstance().getCurrentGame().elapsedTime += Gdx.graphics.getDeltaTime();
             if(!paused)
-                lastTime = elapsedTime;
+                lastTime = App.getInstance().getCurrentGame().elapsedTime;
             Main.getInstance().getBatch().begin();
             worldController.update();
             if(!gameController.isPaused()){
@@ -81,7 +80,7 @@ public class GameController {
     }
 
     public void resumeGame() {
-        elapsedTime = lastTime;
+        App.getInstance().getCurrentGame().elapsedTime = lastTime;
         paused = false;
     }
 

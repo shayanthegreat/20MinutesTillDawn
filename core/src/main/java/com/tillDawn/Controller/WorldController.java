@@ -22,23 +22,27 @@ public class WorldController {
     private float backgroundHeight = 1080;
     private CameraController cameraController = CameraController.getCameraController();
     private Fence fence;
-    private float elapsedTime = 0f;
-    private final float fenceStartTime;
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
-    private ArrayList<Egg> eggs = new ArrayList<>();
-
-
+    private ArrayList<Egg> eggs = App.getInstance().getCurrentGame().eggs;
     private WorldController(PlayerController playerController) {
         this.playerController = playerController;
         backgroundTexture = new Texture(Gdx.files.internal("background.png"));
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         backgroundRegion = new TextureRegion(backgroundTexture);
         backgroundRegion.setRegion(0, 0, (int) backgroundWidth, (int) backgroundHeight);
-        this.fenceStartTime = App.getInstance().getGameTime() / 2f; // Half game time
+        App.getInstance().getCurrentGame().shapeRenderer = new ShapeRenderer();
+        //this.fenceStartTime = App.getInstance().getGameTime() / 2f; // Half game time
         float fenceWidth = 1920;
         float fenceHeight = 1080;
         Player player = App.getInstance().getCurrentPlayer();
-        fence = new Fence(fenceWidth, fenceHeight, player.getPosX(), player.getPosY());
+        if(App.getInstance().getCurrentGame().fenceData == null) {
+            App.getInstance().getCurrentGame().fence = new Fence(fenceWidth, fenceHeight, player.getPosX(), player.getPosY());
+            fence = App.getInstance().getCurrentGame().fence;
+        }
+        else{
+            FenceData fenceData = App.getInstance().getCurrentGame().fenceData;
+            App.getInstance().getCurrentGame().fence = new Fence(fenceData.width, fenceData.height, fenceData.x, fenceData.y);
+            fence = App.getInstance().getCurrentGame().fence;
+        }
     }
 
     // Public method to provide access to the instance
@@ -94,10 +98,9 @@ public class WorldController {
         for (Egg egg : collectedEgg) {
             eggs.remove(egg);
         }
-        elapsedTime += delta;
-
-        if (elapsedTime >= App.getInstance().getGameTime() * 30 && !fence.isActive() && !fence.isWasActive()) {
-            fence = new Fence(1920, 1080, App.getInstance().getCurrentPlayer().getPosX(), App.getInstance().getCurrentPlayer().getPosY());
+        if (App.getInstance().getCurrentGame().elapsedTime >= App.getInstance().getGameTime() * 30 && !fence.isActive() && !fence.isWasActive()) {
+            App.getInstance().getCurrentGame().fence = new Fence(1920, 1080, App.getInstance().getCurrentPlayer().getPosX(), App.getInstance().getCurrentPlayer().getPosY());
+            fence = App.getInstance().getCurrentGame().fence;
             fence.activate();
         }
         if(!GameController.getInstance().isPaused())
@@ -107,7 +110,7 @@ public class WorldController {
 
 
     public Fence getFence() {
-        return fence;
+        return App.getInstance().getCurrentGame().fence;
     }
 
     public CameraController getCameraController() {
@@ -115,14 +118,14 @@ public class WorldController {
     }
 
     public ShapeRenderer getShapeRenderer() {
-        return shapeRenderer;
+        return App.getInstance().getCurrentGame().shapeRenderer;
     }
     public void addEgg(Egg egg) {
-        eggs.add(egg);
+        App.getInstance().getCurrentGame().eggs.add(egg);
     }
 
     public ArrayList<Egg> getEggs() {
-        return eggs;
+        return App.getInstance().getCurrentGame().eggs;
     }
 
 }

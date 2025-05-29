@@ -9,11 +9,8 @@ import com.tillDawn.Model.*;
 import java.util.ArrayList;
 
 public class MonsterController {
-    private boolean isHalf = false;
-    float gameTime = 0f;
     float spawnTimer = 0f;
     float spawnTimer2 = 0f;
-    ArrayList<Monster> monsters = App.getInstance().getMonsters();
     private WeaponController weaponController;
     public MonsterController(WeaponController weaponController) {
         this.weaponController = weaponController;
@@ -27,14 +24,13 @@ public class MonsterController {
             y = MathUtils.random(-1200+player.getPosY(), 1200+player.getPosY());
         }
         Monster monster = new Monster(x, y, 0, type);
-        monsters.add(monster);
+        App.getInstance().getMonsters().add(monster);
     }
 
     public void update(float deltaTime) {
-        gameTime += deltaTime;
         spawnTimer += deltaTime;
         spawnTimer2 += deltaTime;
-        float j = gameTime;
+        float j = App.getInstance().getCurrentGame().elapsedTime;
         if (spawnTimer >= 3f) {
             int monstersToSpawn = (int) j / (30);
 
@@ -52,17 +48,16 @@ public class MonsterController {
             }
             spawnTimer2 -= 10f;
         }
-        if(gameTime >= App.getInstance().getGameTime() * 30 && !isHalf) {
+        if(App.getInstance().getCurrentGame().elapsedTime >= App.getInstance().getGameTime() * 30 && !App.getInstance().getCurrentGame().bigBoss) {
+            App.getInstance().getCurrentGame().bigBoss = true;
             spawnMonster(MonsterType.Shub);
-            isHalf = true;
         }
         Player player = App.getInstance().getCurrentPlayer();
         CollisionRect playerRect = player.getRect();
-        for (Monster monster : monsters) {
+        for (Monster monster : App.getInstance().getMonsters()) {
             CollisionRect monsterRect = monster.getRect();
             if (monster.getMonsterType() == MonsterType.Shub) {
                 monster.update(deltaTime, player.getPosX(), player.getPosY());
-
                 if (monster.getRect().collidesWith(playerRect)) {
                     monster.damage(player);
                 }
@@ -84,7 +79,7 @@ public class MonsterController {
         }
 
         ArrayList<Monster> deadMonsters = new ArrayList<>();
-        for(Monster monster : monsters) {
+        for(Monster monster : App.getInstance().getMonsters()) {
             if(monster.isDead()) {
                 deadMonsters.add(monster);
             }
@@ -92,7 +87,7 @@ public class MonsterController {
         for(Monster monster : deadMonsters) {
             if(monster.getMonsterType() == MonsterType.Shub)
                 WorldController.getInstance().getFence().deactivate();
-            monsters.remove(monster);
+            App.getInstance().getMonsters().remove(monster);
         }
         player.setCurrentKills(deadMonsters.size() + player.getCurrentKills());
     }
@@ -100,7 +95,7 @@ public class MonsterController {
     private void shootBulletAtPlayer(Monster monster, Player player) {
         float startX = monster.getPosX();
         float startY = monster.getPosY();
-        Vector2 direction = new Vector2(Gdx.graphics.getWidth()/2f - startX, Gdx.graphics.getHeight()/2f - startY).nor();
+        Vector2 direction = new Vector2(player.getPosX() - startX, player.getPosY() - startY).nor();
 
         Bullet bullet = new Bullet(5, startX, startY, direction);
         weaponController.addEnemyBullet(bullet);

@@ -3,13 +3,18 @@ package com.tillDawn.Model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
 public class Player {
 
-    private Texture playerTexture = new Texture(Gdx.files.internal("player1-.png"));
-    private Sprite playerSprite = new Sprite(playerTexture);
+    @JsonIgnore
+    private Texture playerTexture;
+    @JsonIgnore
+    private Sprite playerSprite;
+    private String playerTextureFileName = "player1-.png";
     private Weapon weapon = null;
     private CharacterType characterType;
     private float posX = 0;
@@ -29,8 +34,18 @@ public class Player {
     private float damageBoostedLeft = 0;
     private float originalSpeed;
     private ArrayList<AbilityType> abilities = new ArrayList<>();
-    private User user = null;
+    public Player() {
+        loadTextures();
+    }
+
+    public void loadTextures() {
+        if (playerTexture != null) playerTexture.dispose();
+        playerTexture = new Texture(Gdx.files.internal(playerTextureFileName));
+        playerSprite = new Sprite(playerTexture);
+        playerSprite.setSize(60, 80);
+    }
     public Player(CharacterType characterType, Weapon weapon){
+        loadTextures();
         playerSprite.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
         playerSprite.setSize(60, 80);
         posX = (float) Gdx.graphics.getWidth() / 2;
@@ -40,7 +55,6 @@ public class Player {
         this.playerHealth = characterType.getHealth();
         this.maxHealth = characterType.getHealth();
         this.speed = characterType.getSpeed();
-        this.user = App.getInstance().getCurrentUser();
         this.weapon = weapon;
     }
 
@@ -156,14 +170,6 @@ public class Player {
     public float getSpeed() {
         return speed;
     }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-    public User getUser() {
-        return user;
-    }
-
     public void setPosition(float x, float y) {
         this.posX = x;
         this.posY = y;
@@ -232,7 +238,12 @@ public class Player {
         return maxHealth;
     }
 
+    @JsonProperty("dead")
     public boolean isDead() {
         return isDead;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
     }
 }

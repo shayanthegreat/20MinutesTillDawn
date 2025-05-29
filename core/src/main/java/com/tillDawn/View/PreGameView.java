@@ -35,8 +35,6 @@ public class PreGameView implements Screen {
         this.controller = controller;
         this.stage = new Stage(new ScreenViewport());
     }
-
-
     @Override
     public void show() {
 

@@ -11,7 +11,7 @@ public class User {
     private String avatarPath;
     private int xp;
     private int level;
-
+    private GameDetails gameDetails;
     public User() {}
     public User(String name, String password, String question, String answer) {
         this.name = name;
@@ -21,6 +21,7 @@ public class User {
         this.avatarPath = "avatar/Avatar1.png";
         this.xp = 0;
         this.level = 1;
+        this.gameDetails = null;
     }
 
     public String getName() {
@@ -82,5 +83,16 @@ public class User {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public GameDetails getGameDetails() {
+        return gameDetails;
+    }
+    public void setGameDetails(GameDetails gameDetails) {
+        this.gameDetails = gameDetails;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 }

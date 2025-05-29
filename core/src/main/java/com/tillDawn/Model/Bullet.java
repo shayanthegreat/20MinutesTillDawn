@@ -6,22 +6,41 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Bullet {
-    private Texture texture = GameAssetManager.getInstance().getBulletTexture1();
-    private Sprite sprite = new Sprite(texture);
+
+    @JsonIgnore
+    private Texture texture;
+
+    @JsonIgnore
+    private Sprite sprite;
+
+
     private int damage;
     private CollisionRect rect;
     private Vector2 position;
     private Vector2 direction;
     private float speed = 1000f;
+
+    public Bullet() {
+        this.position = new Vector2();
+        this.direction = new Vector2();
+    }
+
     public Bullet(int damage, float x, float y, Vector2 direction) {
         this.damage = damage;
         this.position = new Vector2(x, y);
-        this.direction = direction.nor(); // normalized direction
-        this.sprite.setPosition(x, y);
-        this.sprite.setSize(10, 10);
+        this.direction = direction.nor();
         this.rect = new CollisionRect(x, y, 15, 15);
+        initialize();
+    }
+
+    public void initialize() {
+        this.texture = GameAssetManager.getInstance().getBulletTexture1();
+        this.sprite = new Sprite(texture);
+        this.sprite.setPosition(position.x, position.y);
+        this.sprite.setSize(10, 10);
     }
 
     public void update() {
@@ -33,20 +52,27 @@ public class Bullet {
         rect.setX(position.x);
         rect.setY(position.y);
         rect.move(sprite.getX(), sprite.getY());
+
         if (rect.collidesWith(App.getInstance().getCurrentPlayer().getRect())) {
             App.getInstance().getCurrentPlayer().updateHealth(-damage);
         }
     }
 
     public void monsterHit(Monster monster) {
-        float x = (float) damage;
-        if(App.getInstance().getCurrentPlayer().isDamageBoosted()){
-            x += damage/4f;
+        float x = damage;
+        if (App.getInstance().getCurrentPlayer().isDamageBoosted()) {
+            x += damage / 4f;
         }
         monster.updateHealth(x);
+
+        // Apply knockback
+        float knockbackForce = 3f; // Tune this value based on your game's scale
+        monster.knockback(direction, knockbackForce);
     }
+
+
     public void draw(Batch batch) {
-        sprite.draw(batch);
+        if (sprite != null) sprite.draw(batch);
     }
 
     public Texture getTexture() {

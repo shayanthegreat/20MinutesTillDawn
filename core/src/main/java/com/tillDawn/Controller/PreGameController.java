@@ -74,40 +74,90 @@ public class PreGameController extends Controller{
 
             }
         }
-        App.getInstance().setAutoAim(false);
-        App.getInstance().setCurrentPlayer(new Player(characterType, weapon));
-        App.getInstance().getCurrentPlayer().setUser(App.getInstance().getCurrentUser());
-        int numTrees = 200;
-        float minDistance = 150f; // Minimum allowed distance between trees
 
-        ArrayList<Tree> trees = App.getInstance().getTrees();
-        Texture treeTexture = GameAssetManager.getInstance().getTreeTexture();
+        User newuser = null;
+        for (User user : App.getInstance().getUsers()) {
+            if(user.getName().equals(App.getInstance().getCurrentUser().getName())){
+                newuser = user;
+                break;
+            }
+        }
+        if(newuser != null){
+            App.getInstance().setCurrentUser(newuser);
+        }
+        if (App.getInstance().getCurrentUser().getGameDetails() == null) {
+            App.getInstance().setAutoAim(false);
+            App.getInstance().setCurrentPlayer(new Player(characterType, weapon));
+            int numTrees = 200;
+            float minDistance = 150f; // Minimum allowed distance between trees5
 
-        int attempts = 0;
-        int maxAttempts = numTrees * 10; // prevent infinite loop
-        while (trees.size() < numTrees && attempts < maxAttempts) {
-            float t = MathUtils.random(-8000, 8000);
-            float w = MathUtils.random(-6000, 6000);
+            ArrayList<Tree> trees = App.getInstance().getTrees();
+            Texture treeTexture = GameAssetManager.getInstance().getTreeTexture();
 
-            boolean tooClose = false;
-            for (Tree other : trees) {
-                float dx = other.getWorldX() - t;
-                float dy = other.getWorldY() - w;
-                if (dx * dx + dy * dy < minDistance * minDistance) {
-                    tooClose = true;
-                    break;
+            int attempts = 0;
+            int maxAttempts = numTrees * 10; // prevent infinite loop
+            while (trees.size() < numTrees && attempts < maxAttempts) {
+                float playerX = App.getInstance().getCurrentPlayer().getPosX();
+                float playerY = App.getInstance().getCurrentPlayer().getPosY();
+                float playerSafeRadius = 300f; // adjust depending on game visuals
+
+                while (trees.size() < numTrees && attempts < maxAttempts) {
+                    float t = MathUtils.random(-8000, 8000);
+                    float w = MathUtils.random(-6000, 6000);
+
+                    boolean tooClose = false;
+
+                    // Check distance from existing trees
+                    for (Tree other : trees) {
+                        float dx = other.getWorldX() - t;
+                        float dy = other.getWorldY() - w;
+                        if (dx * dx + dy * dy < minDistance * minDistance) {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+
+                    // Check distance from the player
+                    float dxPlayer = playerX - t;
+                    float dyPlayer = playerY - w;
+                    if (dxPlayer * dxPlayer + dyPlayer * dyPlayer < playerSafeRadius * playerSafeRadius) {
+                        tooClose = true;
+                    }
+
+                    if (!tooClose) {
+                        Sprite sprite = new Sprite(treeTexture);
+                        sprite.setSize(140, 182);
+                        sprite.setPosition(t, w);
+                        trees.add(new Tree(sprite, t, w));
+                    }
+
+                    attempts++;
                 }
             }
-
-            if (!tooClose) {
-                Sprite sprite = new Sprite(treeTexture);
-                sprite.setSize(140, 182);
-                sprite.setPosition(t, w);
-                trees.add(new Tree(sprite, t, w));
+            App.getInstance().getCurrentUser().setGameDetails(App.getInstance().getCurrentGame());
+        }
+        else{
+            App.getInstance().setCurrentGame(App.getInstance().getCurrentUser().getGameDetails());
+            App.getInstance().getCurrentGame().player.loadTextures();
+            App.getInstance().getCurrentGame().player.getWeapon().loadTextureAndSprite();
+            for (Monster monster : App.getInstance().getCurrentGame().monsters) {
+                monster.loadAssets(); // method to load textures, animations, etc.
+            }
+            for (Tree tree : App.getInstance().getCurrentGame().trees) {
+                tree.initialize(); // restores runtime resources
+            }
+            for (Bullet bullet : App.getInstance().getCurrentGame().bullets) {
+                bullet.initialize();
+            }
+            for (Bullet bullet : App.getInstance().getCurrentGame().enemyBullets) {
+                bullet.initialize();
+            }
+            for (Egg egg : App.getInstance().getCurrentGame().eggs) {
+                egg.initialize();
             }
 
-            attempts++;
         }
+
 
     }
 }

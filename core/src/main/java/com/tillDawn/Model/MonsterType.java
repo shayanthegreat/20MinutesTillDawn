@@ -8,39 +8,46 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.ArrayList;
 
 public enum MonsterType {
-    Tentacle("tentacle", 25, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("tentacle/BrainMonster_0.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("tentacle/BrainMonster_1.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("tentacle/BrainMonster_2.png")))), 60, 60),
-    EyeBat("EyeBat", 50, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_0.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_1.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_2.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("eyeBat/T_EyeBat_3.png")))), 60, 60),
-    Shub("Shub", 4000, new Animation<>(0.5f, new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_0.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_1.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_2.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_3.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_4.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_5.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_6.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_7.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_8.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_9.png"))),
-        new TextureRegion(new Texture(Gdx.files.internal("shub/T_ShubNiggurath_10.png")))), 120, 120),
-        ;
+    Tentacle("tentacle", 25, 60, 60, "tentacle/BrainMonster_%d.png", 3, 0.5f),
+    EyeBat("EyeBat", 50, 60, 60, "eyeBat/T_EyeBat_%d.png", 4, 0.5f),
+    Shub("Shub", 4000, 120, 120, "shub/T_ShubNiggurath_%d.png", 11, 0.5f);
+
     private String name;
     private int hp;
     private Animation<TextureRegion> animation;
     private int width;
     private int height;
+    private String animationPathPattern;
+    private int frameCount;
+    private float frameDuration;
 
-    MonsterType(String name, int hp, Animation<TextureRegion> animation, int width, int height) {
+    MonsterType(String name, int hp, int width, int height, String animationPathPattern, int frameCount, float frameDuration) {
         this.name = name;
         this.hp = hp;
-        this.animation = animation;
         this.width = width;
         this.height = height;
+        this.animationPathPattern = animationPathPattern;
+        this.frameCount = frameCount;
+        this.frameDuration = frameDuration;
+        loadAnimation();
     }
 
+    public void loadAnimation() {
+        TextureRegion[] frames = new TextureRegion[frameCount];
+        for (int i = 0; i < frameCount; i++) {
+            String path = String.format(animationPathPattern, i);
+            Texture tex = new Texture(Gdx.files.internal(path));
+            frames[i] = new TextureRegion(tex);
+        }
+        animation = new Animation<>(frameDuration, frames);
+    }
+
+    public Animation<TextureRegion> getAnimation() {
+        if (animation == null) {
+            loadAnimation();
+        }
+        return animation;
+    }
     public String getName() {
         return name;
     }
@@ -48,11 +55,6 @@ public enum MonsterType {
     public int getHp() {
         return hp;
     }
-
-    public Animation<TextureRegion> getAnimation() {
-        return animation;
-    }
-
     public int getWidth() {
         return width;
     }

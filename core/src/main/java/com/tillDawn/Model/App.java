@@ -1,5 +1,6 @@
 package com.tillDawn.Model;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -9,17 +10,19 @@ public class App {
     private static App app;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
-    private Player currentPlayer = null;
     private User currentUser = new User("guest", "", "", "");
-    private ArrayList<Tree> trees = new ArrayList<>();
-    private boolean autoReload = false;
-    private boolean sfxSound = false;
-    private boolean musicSound = false;
-    private int gameTime;
-    private boolean autoAim;
-    ArrayList<Monster> monsters = new ArrayList<>();
+    private GameDetails currentGame = new GameDetails();
     public App() {
+        boolean flag = false;
         loadUsersFromJson("users.json");
+        for (User user : users) {
+            if(user.getName().equals("guest")){
+                flag = true;
+            }
+        }
+        if(!flag){
+            users.add(currentUser);
+        }
     }
 
     public static App getInstance() {
@@ -38,23 +41,15 @@ public class App {
     }
 
     public Player getCurrentPlayer() {
-        return currentPlayer;
+        return currentGame.player;
     }
 
     public boolean isAutoReload() {
-        return autoReload;
+        return currentGame.autoReload;
     }
 
     public void setAutoReload(boolean autoReload) {
-        this.autoReload = autoReload;
-    }
-
-    public ArrayList<Tree> getTrees() {
-        return trees;
-    }
-
-    public ArrayList<Monster> getMonsters() {
-        return monsters;
+        currentGame.autoReload = autoReload;
     }
 
     public User getCurrentUser() {
@@ -66,39 +61,39 @@ public class App {
     }
 
     public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
+        currentGame.player = currentPlayer;
     }
 
     public boolean isSfxSound() {
-        return sfxSound;
+        return currentGame.sfxSound;
     }
 
     public void setSfxSound(boolean sfxSound) {
-        this.sfxSound = sfxSound;
+        currentGame.sfxSound = sfxSound;
     }
 
     public boolean isMusicSound() {
-        return musicSound;
+        return currentGame.musicSound;
     }
 
     public void setMusicSound(boolean musicSound) {
-        this.musicSound = musicSound;
+        currentGame.musicSound = musicSound;
     }
 
     public int getGameTime() {
-        return gameTime;
+        return currentGame.gameTime;
     }
 
     public void setGameTime(int gameTime) {
-        this.gameTime = gameTime;
+        currentGame.gameTime = gameTime;
     }
 
     public boolean isAutoAim() {
-        return autoAim;
+        return currentGame.autoAim;
     }
 
     public void setAutoAim(boolean autoAim) {
-        this.autoAim = autoAim;
+        currentGame.autoAim = autoAim;
     }
 
     public void loadUsersFromJson(String path) {
@@ -111,9 +106,30 @@ public class App {
 
     public void AppCloser(){
         UserSaver.saveUsers(users, "users.json");
+        Gdx.app.exit();
     }
 
-//    public void updateOrAddCurrentUser(String path) {
+    public ArrayList<Monster> getMonsters() {
+        return currentGame.monsters;
+    }
+
+    public ArrayList<Tree> getTrees(){
+        return currentGame.trees;
+    }
+
+    public ArrayList<Bullet> getBullets(){
+        return currentGame.bullets;
+    }
+
+    public ArrayList<Bullet> getEnemyBullets(){
+        return currentGame.enemyBullets;
+    }
+
+    public GameDetails getCurrentGame() {
+        return currentGame;
+    }
+
+    //    public void updateOrAddCurrentUser(String path) {
 //        boolean updated = false;
 //        for (int i = 0; i < users.size(); i++) {
 //            if (users.get(i).getName().equals(currentUser.getName())) {
@@ -129,4 +145,10 @@ public class App {
 //
 //        saveUsersToJson(path);
 //    }
+
+
+    public void setCurrentGame(GameDetails currentGame) {
+        this.currentGame = currentGame;
+    }
+
 }
