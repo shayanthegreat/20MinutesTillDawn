@@ -151,4 +151,16 @@ public class App {
         this.currentGame = currentGame;
     }
 
+    //public void se
+    public void pause(){
+        App.getInstance().getCurrentGame().pause = true;
+    }
+
+    public void resume(){
+        App.getInstance().getCurrentGame().pause = false;
+    }
+
+    public boolean isPause(){
+        return App.getInstance().getCurrentGame().pause;
+    }
 }

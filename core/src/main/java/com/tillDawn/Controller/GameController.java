@@ -12,20 +12,16 @@ import com.tillDawn.View.GameView;
 
 public class GameController {
 
-    private static GameController gameController;
     private GameView view;
     private WorldController worldController;
     private PlayerController playerController;
     private WeaponController weaponController;
     private MonsterController monsterController;
     private float lastTime;
-    private boolean paused = false;
 
-    public static GameController getInstance() {
-        if (gameController == null) {
-            gameController = new GameController();
-        }
-        return gameController;
+    public GameController() {
+        lastTime = App.getInstance().getCurrentGame().elapsedTime;
+        App.getInstance().getCurrentGame().pause = false;
     }
     public Monster getNearestMonster(float maxRange) {
         float playerX = App.getInstance().getCurrentPlayer().getPlayerSprite().getX() + App.getInstance().getCurrentPlayer().getPlayerSprite().getWidth() / 2;
@@ -51,7 +47,7 @@ public class GameController {
     public void setView(GameView view) {
         this.view = view;
         this.playerController = new PlayerController(App.getInstance().getCurrentPlayer());
-        this.worldController = WorldController.getInstance(playerController);
+        this.worldController = new WorldController(this.playerController);
         this.weaponController = new WeaponController();
         this.monsterController = new MonsterController(weaponController);
          // Make it larger
@@ -61,11 +57,11 @@ public class GameController {
 
         if(view != null){
             App.getInstance().getCurrentGame().elapsedTime += Gdx.graphics.getDeltaTime();
-            if(!paused)
+            if(!App.getInstance().isPause())
                 lastTime = App.getInstance().getCurrentGame().elapsedTime;
             Main.getInstance().getBatch().begin();
             worldController.update();
-            if(!gameController.isPaused()){
+            if(!App.getInstance().isPause()){
                 playerController.update();
                 weaponController.update();
                 monsterController.update(Gdx.graphics.getDeltaTime());
@@ -76,12 +72,12 @@ public class GameController {
 
 
     public void pauseGame() {
-        paused = true;
+        App.getInstance().pause();
     }
 
     public void resumeGame() {
         App.getInstance().getCurrentGame().elapsedTime = lastTime;
-        paused = false;
+        App.getInstance().resume();
     }
 
 
@@ -99,7 +95,7 @@ public class GameController {
     }
 
     public boolean isPaused() {
-        return paused;
+        return App.getInstance().isPause();
     }
 
     public float getLastTime() {

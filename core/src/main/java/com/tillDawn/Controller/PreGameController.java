@@ -75,6 +75,7 @@ public class PreGameController extends Controller{
             }
         }
 
+        App.getInstance().loadUsersFromJson("Users.json");
         User newuser = null;
         for (User user : App.getInstance().getUsers()) {
             if(user.getName().equals(App.getInstance().getCurrentUser().getName())){
@@ -88,6 +89,7 @@ public class PreGameController extends Controller{
         if (App.getInstance().getCurrentUser().getGameDetails() == null) {
             App.getInstance().setAutoAim(false);
             App.getInstance().setCurrentPlayer(new Player(characterType, weapon));
+            App.getInstance().getCurrentGame().elapsedTime = 0;
             int numTrees = 200;
             float minDistance = 150f; // Minimum allowed distance between trees5
 
@@ -140,6 +142,7 @@ public class PreGameController extends Controller{
             App.getInstance().setCurrentGame(App.getInstance().getCurrentUser().getGameDetails());
             App.getInstance().getCurrentGame().player.loadTextures();
             App.getInstance().getCurrentGame().player.getWeapon().loadTextureAndSprite();
+            App.getInstance().getCurrentGame().pause = false;
             for (Monster monster : App.getInstance().getCurrentGame().monsters) {
                 monster.loadAssets(); // method to load textures, animations, etc.
             }

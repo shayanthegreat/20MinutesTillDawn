@@ -86,7 +86,7 @@ public class MonsterController {
         }
         for(Monster monster : deadMonsters) {
             if(monster.getMonsterType() == MonsterType.Shub)
-                WorldController.getInstance().getFence().deactivate();
+                App.getInstance().getCurrentGame().fence.deactivate();
             App.getInstance().getMonsters().remove(monster);
         }
         player.setCurrentKills(deadMonsters.size() + player.getCurrentKills());

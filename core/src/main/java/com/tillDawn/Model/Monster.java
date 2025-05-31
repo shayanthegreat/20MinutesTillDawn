@@ -220,9 +220,9 @@ public class Monster {
         this.health -= x;
         if (this.health <= 0 && !this.dead && !this.playingDeathAnimation) {
             if (monsterType == MonsterType.EyeBat) {
-                WorldController.getInstance().addEgg(new Egg("eyeBat/T_EyeBat_EM.png", posX, posY));
+                App.getInstance().getCurrentGame().eggs.add(new Egg("eyeBat/T_EyeBat_EM.png", posX, posY));
             } else if (monsterType == MonsterType.Tentacle) {
-                WorldController.getInstance().addEgg(new Egg("tentacle/BrainMonster_Em.png", posX, posY));
+                App.getInstance().getCurrentGame().eggs.add(new Egg("tentacle/BrainMonster_Em.png", posX, posY));
             }
             this.playingDeathAnimation = true;
             this.deathAnimationTime = 0f;

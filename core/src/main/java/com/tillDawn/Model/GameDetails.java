@@ -25,6 +25,11 @@ public class GameDetails {
     @JsonIgnore
     public transient ShapeRenderer shapeRenderer;
     public Player player;
-
+    @JsonIgnore
+    public boolean pause;
     public ArrayList<Egg> eggs = new ArrayList<>();
+    public GameDetails() {
+        elapsedTime = 0f;
+    }
+
 }

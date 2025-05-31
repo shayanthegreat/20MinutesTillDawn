@@ -30,6 +30,7 @@ public class GameView implements Screen, InputProcessor {
     private boolean pauseMenuButton = false;
     private boolean winOrLoseButton = false;
     TextButton giveUpButton;
+    TextButton giveUpButton2;
     private Player player;
     public GameView(GameController gameController, Skin skin) {
         this.gameController = gameController;
@@ -203,7 +204,7 @@ public class GameView implements Screen, InputProcessor {
         }
         Main.getInstance().getBatch().end();
         drawLevelBar();
-        if (GameController.getInstance().isPaused() && !levelUpPopupShown && !pauseMenuButton && !winOrLoseButton) {
+        if (gameController.isPaused() && !levelUpPopupShown && !pauseMenuButton && !winOrLoseButton) {
             showLevelUpPopup();
             levelUpPopupShown = true;
         }
@@ -357,12 +358,14 @@ public class GameView implements Screen, InputProcessor {
         // Resume and Leave buttons
         TextButton resumeButton = new TextButton("Resume", skin);
         TextButton leaveButton = new TextButton("Leave Game", skin);
+        TextButton leaveButton2 = new TextButton("Give Up", skin);
 
         float buttonWidth = 400;
         float buttonHeight = 120;
 
         table.add(resumeButton).width(buttonWidth).height(buttonHeight).pad(20);
         table.add(leaveButton).width(buttonWidth).height(buttonHeight).pad(20);
+        table.add(leaveButton2).width(buttonWidth).height(buttonHeight).pad(20);
 
         // Button listeners
         resumeButton.addListener(new ChangeListener() {
@@ -376,7 +379,12 @@ public class GameView implements Screen, InputProcessor {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 saveGame();
-
+            }
+        });
+        leaveButton2.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                leaveGame();
             }
         });
 
@@ -436,7 +444,7 @@ public class GameView implements Screen, InputProcessor {
     }
 
     public void drawEgg(){
-        for (Egg egg : WorldController.getInstance().getEggs()) {
+        for (Egg egg : App.getInstance().getCurrentGame().eggs) {
             egg.render(Main.getInstance().getBatch());
         }
     }
@@ -546,6 +554,9 @@ public class GameView implements Screen, InputProcessor {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 App.getInstance().getCurrentUser().setGameDetails(null);
+                App.getInstance().setCurrentGame(new GameDetails());
+                System.out.println("game destroyed!");
+                App.getInstance().saveUsersToJson("users.json");
                 Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
             }
         });
@@ -603,7 +614,8 @@ public class GameView implements Screen, InputProcessor {
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                App.getInstance().getCurrentUser().setGameDetails(null);
+                App.getInstance().getCurrentUser().setGameDetails(new GameDetails());
+                App.getInstance().saveUsersToJson("users.json");
                 Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
             }
         });
@@ -613,6 +625,13 @@ public class GameView implements Screen, InputProcessor {
     void saveGame(){
         App.getInstance().getCurrentUser().setGameDetails(App.getInstance().getCurrentGame());
         App.getInstance().saveUsersToJson("users.json");
+        Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
+    }
+    void leaveGame(){
+        App.getInstance().getCurrentUser().setGameDetails(null);
+        App.getInstance().setCurrentGame(new GameDetails());
+        App.getInstance().saveUsersToJson("users.json");
+        System.out.println("game is destroyed!");
         Main.getInstance().setScreen(new MainView(new MainController(), GameAssetManager.getInstance().getSkin()));
     }
 }

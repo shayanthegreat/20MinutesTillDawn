@@ -23,7 +23,7 @@ public class WorldController {
     private CameraController cameraController = CameraController.getCameraController();
     private Fence fence;
     private ArrayList<Egg> eggs = App.getInstance().getCurrentGame().eggs;
-    private WorldController(PlayerController playerController) {
+    public WorldController(PlayerController playerController) {
         this.playerController = playerController;
         backgroundTexture = new Texture(Gdx.files.internal("background.png"));
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
@@ -43,18 +43,6 @@ public class WorldController {
             App.getInstance().getCurrentGame().fence = new Fence(fenceData.width, fenceData.height, fenceData.x, fenceData.y);
             fence = App.getInstance().getCurrentGame().fence;
         }
-    }
-
-    // Public method to provide access to the instance
-    public static WorldController getInstance(PlayerController playerController) {
-        if (instance == null) {
-            instance = new WorldController(playerController);
-        }
-        return instance;
-    }
-
-    public static WorldController getInstance() {
-        return instance;
     }
 
     public void update() {
@@ -103,7 +91,7 @@ public class WorldController {
             fence = App.getInstance().getCurrentGame().fence;
             fence.activate();
         }
-        if(!GameController.getInstance().isPaused())
+        if(!App.getInstance().isPause())
             fence.update(delta);
         fence.checkCollision(App.getInstance().getCurrentPlayer(), delta);
     }

@@ -78,7 +78,7 @@ public class User {
         this.xp += xp;
         if(this.xp >= level * 20){
             this.xp -= level * 20;
-            GameController.getInstance().pauseGame();
+            App.getInstance().pause();
             level++;
         }
     }
